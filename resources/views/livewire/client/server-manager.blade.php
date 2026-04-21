@@ -158,8 +158,10 @@
                         @forelse($nodes as $node)
                             <flux:select.option value="{{ $node->id }}" {{ $node->status === 'offline' ? 'disabled' : '' }}>
                                 {{ $node->label }}
-                                @if($node->status === 'online') ✓ Online @if($node->latency_ms) ({{ $node->latency_ms }}ms) @endif
-                                @elseif($node->status === 'offline') ✗ Offline
+                                @if($node->status === 'online')
+                                    ✓ Online {{ $node->latency_ms ? "({$node->latency_ms}ms)" : '' }}
+                                @else
+                                    ✗ Offline
                                 @endif
                             </flux:select.option>
                         @empty
