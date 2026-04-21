@@ -18,6 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('subscription:check')->everyFiveMinutes();
     })
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
+        
         $middleware->alias([
             'admin' => AdminMiddleware::class,
             '2fa.enforce' => EnforceTwoFactor::class,
