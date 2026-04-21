@@ -103,3 +103,14 @@ EXPOSE 9000
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm"]
+
+# ---
+
+# Stage 4: Nginx Web Server
+FROM nginx:stable-alpine AS web
+
+# Copy compiled public assets from production stage
+COPY --from=production /var/www/public /var/www/public
+
+# Copy Nginx config
+COPY docker/nginx/laravel.conf /etc/nginx/conf.d/default.conf

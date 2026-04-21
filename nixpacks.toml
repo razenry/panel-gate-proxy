@@ -1,6 +1,0 @@
-[phases.install]
-cmds = ["composer install --no-dev --optimize-autoloader", "npm install"]
-
-[phases.build]
-dependsOn = ["install"]
-cmds = ["npm run build"]
