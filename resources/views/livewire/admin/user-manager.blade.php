@@ -188,20 +188,31 @@
             <!-- Provision New Subscription -->
             <div>
                 <flux:heading size="md" class="mb-3">Assign New Plan</flux:heading>
-                <form wire:submit="assignSubscription" class="flex items-end gap-3">
-                    <div class="flex-1">
-                        <flux:field>
-                            <flux:label>Select Plan to Assign</flux:label>
-                            <flux:select wire:model="selectedPlanId">
-                                <option value="" disabled selected>Choose a package...</option>
-                                @foreach($plans as $plan)
-                                    <option value="{{ $plan->id }}">{{ $plan->name }} (Up to {{ $plan->max_server }} servers)</option>
-                                @endforeach
-                            </flux:select>
-                            <flux:error name="selectedPlanId" />
-                        </flux:field>
+                <form wire:submit="assignSubscription" class="space-y-4">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-1">
+                            <flux:field>
+                                <flux:label>Select Plan to Assign</flux:label>
+                                <flux:select wire:model="selectedPlanId">
+                                    <flux:select.option value="" disabled selected>Choose a package...</flux:select.option>
+                                    @foreach($plans as $plan)
+                                        <flux:select.option value="{{ $plan->id }}">{{ $plan->name }} (Up to {{ $plan->max_server }} servers)</flux:select.option>
+                                    @endforeach
+                                </flux:select>
+                                <flux:error name="selectedPlanId" />
+                            </flux:field>
+                        </div>
+                        <div class="w-64">
+                            <flux:field>
+                                <flux:label>Custom Expiration (Optional)</flux:label>
+                                <flux:input type="datetime-local" wire:model="expiredAt" />
+                                <flux:error name="expiredAt" />
+                            </flux:field>
+                        </div>
                     </div>
-                    <flux:button type="submit" variant="primary" icon="plus">Assign Plan</flux:button>
+                    <div class="flex justify-end pt-2">
+                        <flux:button type="submit" variant="primary" icon="plus">Assign Plan</flux:button>
+                    </div>
                 </form>
             </div>
             

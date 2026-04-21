@@ -50,9 +50,15 @@
                             <span class="text-zinc-500 uppercase">Region</span>
                             <span class="font-bold text-zinc-700 dark:text-zinc-300">{{ $server->node->label }}</span>
                         </div>
-                        <div class="flex justify-between text-[10px] font-mono">
-                            <span class="text-zinc-500 uppercase">Public Endpoint</span>
-                            <span class="truncate ml-4 text-blue-600 dark:text-blue-400 font-bold">{{ $server->domain ?? ('kafka_'.$server->identifier.'.'.( \App\Models\Setting::get('cloudflare', [])['domain'] ?? 'raznar.net')) }}</span>
+                        <div class="flex justify-between text-[10px] font-mono items-center">
+                            <span class="text-zinc-500 uppercase">Connect Address</span>
+                            <span class="truncate ml-2 px-1.5 py-0.5 bg-zinc-200/50 dark:bg-zinc-700/50 rounded flex items-center text-blue-600 dark:text-blue-400 font-bold">
+                                @if($server->status === 'active')
+                                    connect {{ $server->domain ?? ('kafka_'.$server->identifier.'.'.( \App\Models\Setting::get('cloudflare', [])['domain'] ?? 'raznar.net')) }}
+                                @else
+                                    pending ({{ $server->identifier }})
+                                @endif
+                            </span>
                         </div>
                     </div>
                 </div>

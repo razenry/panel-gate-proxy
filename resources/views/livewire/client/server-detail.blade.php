@@ -31,33 +31,87 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div class="lg:col-span-2 space-y-6">
 
-            {{-- Endpoint --}}
-            <flux:card class="space-y-4">
+            {{-- CFX Gate Proxy Info --}}
+            <flux:card class="space-y-6">
                 <div>
-                    <flux:heading level="2" size="lg">Gate Endpoint</flux:heading>
-                    <flux:subheading>Public domain routed through the proxy node.</flux:subheading>
+                    <flux:heading level="2" size="lg">CFX Gate Proxy Info</flux:heading>
+                    <flux:subheading>Manage your globally distributed reverse proxy endpoints.</flux:subheading>
                 </div>
-                <div class="flex items-center gap-4 p-5 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-zinc-100 dark:border-zinc-800">
-                    @if($server->status === 'active')
-                        <div class="text-xl font-mono font-bold tracking-tighter truncate flex-1 leading-none text-blue-600 dark:text-blue-400">
-                            {{ $domain }}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <flux:field>
+                        <flux:label>Identifier</flux:label>
+                        <flux:input value="{{ $server->identifier }}" readonly />
+                    </flux:field>
+                    <flux:field>
+                        <flux:label>Node Region</flux:label>
+                        <flux:input value="{{ $server->node->label }} — {{ $server->node->name }}" readonly />
+                    </flux:field>
+                </div>
+
+                <div class="mt-6">
+                    <flux:heading level="3" class="mb-3">In-Game Connection Address</flux:heading>
+                    <div class="flex items-center gap-4 p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-zinc-100 dark:border-zinc-800">
+                        @if($server->status === 'active')
+                            <div class="text-xl font-mono font-bold tracking-tighter truncate flex-1 leading-none text-blue-600 dark:text-blue-400">
+                                connect {{ $domain }}
+                            </div>
+                            <flux:button
+                                size="sm"
+                                variant="ghost"
+                                icon="clipboard"
+                                x-on:click="navigator.clipboard.writeText('connect {{ $domain }}'); $flux.toast({ text: 'Copied to clipboard!', variant: 'success' })"
+                            />
+                        @else
+                            <div class="text-sm text-zinc-400 italic">Domain will appear after provisioning completes.</div>
+                        @endif
+                    </div>
+                </div>
+
+                @if($server->status === 'active')
+                <div class="mt-4">
+                    <flux:heading level="3" class="mb-3">Raw Hostname and Port</flux:heading>
+                    <div class="flex items-center gap-4 p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-zinc-100 dark:border-zinc-800">
+                        <div class="text-sm font-mono font-bold tracking-tighter truncate flex-1 leading-none text-zinc-700 dark:text-zinc-300">
+                            {{ $domain }}:{{ $server->dest_port ?? '32054' }}
                         </div>
                         <flux:button
                             size="sm"
                             variant="ghost"
                             icon="clipboard"
-                            x-on:click="navigator.clipboard.writeText('{{ $domain }}'); $flux.toast({ text: 'Copied to clipboard!', variant: 'success' })"
+                            x-on:click="navigator.clipboard.writeText('{{ $domain }}:{{ $server->dest_port ?? '32054' }}'); $flux.toast({ text: 'Copied to clipboard!', variant: 'success' })"
                         />
-                    @else
-                        <div class="text-sm text-zinc-400 italic">Domain will appear after provisioning completes.</div>
-                    @endif
+                    </div>
+                    <flux:text variant="subtle" size="xs" class="mt-2 font-medium">Copy this command and paste it into your FiveM or RedM console to join.</flux:text>
                 </div>
+                @endif
+                
                 @if($server->proxy_id)
-                    <flux:text variant="subtle" size="xs" class="font-mono">Gate ID: {{ $server->proxy_id }}</flux:text>
+                    <flux:text variant="subtle" size="xs" class="font-mono mt-4">Gate ID: {{ $server->proxy_id }}</flux:text>
                 @endif
             </flux:card>
 
-            {{-- Target & Node --}}
+            {{-- CFX Join Guide --}}
+            <flux:card class="space-y-4 border-dashed border-2 border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-800/20">
+                <div class="flex items-center gap-3">
+                    <flux:icon icon="information-circle" class="text-blue-500" />
+                    <flux:heading level="3">CFX Join Guide</flux:heading>
+                </div>
+                <ol class="list-decimal list-inside space-y-2 text-sm text-zinc-700 dark:text-zinc-300">
+                    <li>Open <strong>FiveM</strong> or <strong>RedM</strong> on your computer.</li>
+                    <li>Press the <strong>F8</strong> key to open the client console.</li>
+                    <li>Paste the command below and press Enter to join.</li>
+                </ol>
+                @if($server->status === 'active')
+                    <div class="mt-3 p-3 bg-zinc-950 rounded-lg border border-zinc-800">
+                        <code class="text-emerald-400 font-mono text-sm block">connect {{ $domain }}:{{ $server->dest_port ?? '32054' }}</code>
+                    </div>
+                @else
+                    <div class="mt-3 p-3 bg-zinc-950 rounded-lg border border-zinc-800 opacity-50">
+                        <code class="text-emerald-400 font-mono text-sm block">connect pending...</code>
+                    </div>
+                @endif
+            </flux:card>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <flux:card class="space-y-4">
                     <flux:heading level="3">Target Settings</flux:heading>

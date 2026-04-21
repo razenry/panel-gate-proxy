@@ -39,6 +39,9 @@
                     <flux:navlist.item icon="users" :href="route('admin.users')" :current="request()->routeIs('admin.users')" wire:navigate>
                         {{ __('Users') }}
                     </flux:navlist.item>
+                    <flux:navlist.item icon="ticket" :href="route('admin.subscriptions')" :current="request()->routeIs('admin.subscriptions')" wire:navigate>
+                        {{ __('Subscriptions') }}
+                    </flux:navlist.item>
                     <flux:navlist.item icon="cog-8-tooth" :href="route('admin.settings')" :current="request()->routeIs('admin.settings')" wire:navigate>
                         {{ __('System Settings') }}
                     </flux:navlist.item>
@@ -49,6 +52,17 @@
         <flux:spacer />
 
         @auth
+            @if(session()->has('impersonated_user_id'))
+                <flux:navlist variant="minimal" class="mb-4">
+                    <form id="impersonate-stop-form" action="{{ route('admin.impersonate.stop') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
+                    <flux:navlist.item icon="arrow-left-end-on-rectangle" href="#" onclick="event.preventDefault(); document.getElementById('impersonate-stop-form').submit();" class="text-amber-600 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/50">
+                        {{ __('Exit Client Mode') }}
+                    </flux:navlist.item>
+                </flux:navlist>
+            @endif
+
             @if(session()->has('sso_admin_id'))
                 <flux:navlist variant="minimal" class="mb-4">
                     <form id="sso-return-form" action="{{ route('sso.return') }}" method="POST" style="display: none;">

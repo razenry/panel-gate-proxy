@@ -43,6 +43,8 @@ class UserManager extends Component
     public ?int $manageSubUserId = null;
 
     public ?int $selectedPlanId = null;
+    
+    public ?string $expiredAt = null;
 
     // Secure Delete State
     public bool $showDeleteModal = false;
@@ -128,6 +130,7 @@ class UserManager extends Component
     {
         $this->manageSubUserId = $userId;
         $this->selectedPlanId = null;
+        $this->expiredAt = null;
         $this->showSubModal = true;
     }
 
@@ -135,12 +138,13 @@ class UserManager extends Component
     {
         $this->validate([
             'selectedPlanId' => 'required|exists:plans,id',
+            'expiredAt' => 'nullable|date',
         ]);
 
         $plan = Plan::findOrFail($this->selectedPlanId);
         $user = User::findOrFail($this->manageSubUserId);
 
-        $expiredAt = $this->calculateExpiry();
+        $expiry = $this->expiredAt ? CarbonImmutable::parse($this->expiredAt) : $this->calculateExpiry();
 
         Subscription::create([
             'user_id' => $user->id,
@@ -148,10 +152,11 @@ class UserManager extends Component
             'plan_name' => $plan->name,
             'max_server' => $plan->max_server,
             'status' => 'active',
-            'expired_at' => $expiredAt,
+            'expired_at' => $expiry,
         ]);
 
         $this->selectedPlanId = null;
+        $this->expiredAt = null;
         Flux::toast(text: "Plan {$plan->name} assigned to {$user->name}.", variant: 'success');
     }
 

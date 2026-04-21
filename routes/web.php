@@ -29,6 +29,7 @@ Route::middleware(['auth', 'verified', '2fa.enforce'])->group(function () {
         Route::view('plans', 'pages.admin.plans')->name('plans');
         Route::view('servers', 'pages.admin.servers')->name('servers');
         Route::get('users', UserManager::class)->name('users');
+        Route::get('subscriptions', \App\Livewire\Admin\SubscriptionManager::class)->name('subscriptions');
         Route::get('settings', Settings::class)->name('settings');
 
         // Impersonation
