@@ -84,8 +84,8 @@ RUN composer dump-autoload --no-dev --optimize
 RUN cp .env.example .env && \
     php artisan key:generate
 
-ENV APP_ENV=production
-ENV APP_DEBUG=false
+ENV APP_ENV=dev
+ENV APP_DEBUG=true
 ENV LOG_CHANNEL=stderr
 
 # Setup permissions for full folder to allow local dev mounts
