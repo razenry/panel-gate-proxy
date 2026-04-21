@@ -42,9 +42,9 @@ class UserManager extends Component
 
     public ?int $manageSubUserId = null;
 
-    public ?int $selectedPlanId = null;
+    public $selectedPlanId = '';
     
-    public ?string $expiredAt = null;
+    public $expiredAt = '';
 
     // Secure Delete State
     public bool $showDeleteModal = false;
@@ -129,8 +129,8 @@ class UserManager extends Component
     public function openSubModal(int $userId)
     {
         $this->manageSubUserId = $userId;
-        $this->selectedPlanId = null;
-        $this->expiredAt = null;
+        $this->selectedPlanId = '';
+        $this->expiredAt = '';
         $this->showSubModal = true;
     }
 
@@ -155,8 +155,8 @@ class UserManager extends Component
             'expired_at' => $expiry,
         ]);
 
-        $this->selectedPlanId = null;
-        $this->expiredAt = null;
+        $this->selectedPlanId = '';
+        $this->expiredAt = '';
         Flux::toast(text: "Plan {$plan->name} assigned to {$user->name}.", variant: 'success');
     }
 

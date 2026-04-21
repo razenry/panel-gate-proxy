@@ -44,10 +44,10 @@
 
                 <flux:field>
                     <flux:label>Duration Metric</flux:label>
-                    <flux:select wire:model="subscription_duration_unit">
-                        <option value="days">Days</option>
-                        <option value="months">Months</option>
-                        <option value="years">Years</option>
+                    <flux:select wire:model="subscription_duration_unit" placeholder="Select metric...">
+                        <flux:select.option value="days">Days</flux:select.option>
+                        <flux:select.option value="months">Months</flux:select.option>
+                        <flux:select.option value="years">Years</flux:select.option>
                     </flux:select>
                     <flux:error name="subscription_duration_unit" />
                 </flux:field>

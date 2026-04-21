@@ -124,8 +124,7 @@
 
             <flux:field>
                 <flux:label>Select Plan</flux:label>
-                <flux:select wire:model="selectedPlanId">
-                    <flux:select.option value="" disabled selected>Choose a package...</flux:select.option>
+                <flux:select wire:model="selectedPlanId" placeholder="Choose a package...">
                     @foreach($plans as $plan)
                         <flux:select.option value="{{ $plan->id }}">{{ $plan->name }} (Up to {{ $plan->max_server }} servers)</flux:select.option>
                     @endforeach
@@ -145,7 +144,7 @@
             @if($editingSubId)
                 <flux:field>
                     <flux:label>Status Override</flux:label>
-                    <flux:select wire:model="status">
+                    <flux:select wire:model="status" placeholder="Select status...">
                         <flux:select.option value="active">Active</flux:select.option>
                         <flux:select.option value="suspended">Suspended</flux:select.option>
                         <flux:select.option value="expired">Expired</flux:select.option>

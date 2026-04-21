@@ -193,8 +193,7 @@
                         <div class="flex-1">
                             <flux:field>
                                 <flux:label>Select Plan to Assign</flux:label>
-                                <flux:select wire:model="selectedPlanId">
-                                    <flux:select.option value="" disabled selected>Choose a package...</flux:select.option>
+                                <flux:select wire:model="selectedPlanId" placeholder="Choose a package...">
                                     @foreach($plans as $plan)
                                         <flux:select.option value="{{ $plan->id }}">{{ $plan->name }} (Up to {{ $plan->max_server }} servers)</flux:select.option>
                                     @endforeach

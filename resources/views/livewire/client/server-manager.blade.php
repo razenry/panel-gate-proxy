@@ -154,17 +154,16 @@
                 {{-- Node --}}
                 <flux:field>
                     <flux:label badge="Required">Proxy Region</flux:label>
-                    <flux:select wire:model.live="node_id">
-                        <option value="">Select a region…</option>
+                    <flux:select wire:model.live="node_id" placeholder="Select a region…">
                         @forelse($nodes as $node)
-                            <option value="{{ $node->id }}" {{ $node->status === 'offline' ? 'disabled' : '' }}>
+                            <flux:select.option value="{{ $node->id }}" {{ $node->status === 'offline' ? 'disabled' : '' }}>
                                 {{ $node->label }}
                                 @if($node->status === 'online') ✓ Online @if($node->latency_ms) ({{ $node->latency_ms }}ms) @endif
                                 @elseif($node->status === 'offline') ✗ Offline
                                 @endif
-                            </option>
+                            </flux:select.option>
                         @empty
-                            <option value="" disabled>No regions available</option>
+                            <flux:select.option value="" disabled>No regions available</flux:select.option>
                         @endforelse
                     </flux:select>
                     <flux:description>The system will automatically assign an available proxy port on this node.</flux:description>
@@ -174,24 +173,23 @@
                 {{-- Subscription --}}
                 <flux:field>
                     <flux:label badge="Required">Subscription Plan</flux:label>
-                    <flux:select wire:model="subscription_id">
+                    <flux:select wire:model="subscription_id" placeholder="Choose a plan…">
                         @if($subscriptions->isEmpty())
-                            <option value="" disabled selected>No active subscription</option>
+                            <flux:select.option value="" disabled>No active subscription</flux:select.option>
                         @else
-                            <option value="" disabled selected>Choose a plan…</option>
                             @foreach($subscriptions as $sub)
                                 @php
                                     $used  = auth()->user()->servers()->where('subscription_id', $sub->id)->count();
                                     $left  = $sub->max_server - $used;
                                     $full  = $left <= 0;
                                 @endphp
-                                <option value="{{ $sub->id }}" {{ $full ? 'disabled' : '' }}>
+                                <flux:select.option value="{{ $sub->id }}" {{ $full ? 'disabled' : '' }}>
                                     {{ $sub->plan_name }} — {{ $left }}/{{ $sub->max_server }} slots
                                     @if($sub->expired_at)
                                         (Exp: {{ $sub->expired_at->locale('id')->translatedFormat('d F Y H:i') }} WIB)
                                     @endif
                                     {{ $full ? '- Full' : '' }}
-                                </option>
+                                </flux:select.option>
                             @endforeach
                         @endif
                     </flux:select>

@@ -25,9 +25,9 @@ class SubscriptionManager extends Component
     public ?int $editingSubId = null;
 
     // Create/Edit fields
-    public $manageSubUserId = null;
-    public $selectedPlanId = null;
-    public $expiredAt = null;
+    public $manageSubUserId = '';
+    public $selectedPlanId = '';
+    public $expiredAt = '';
     public $status = 'active';
     
     // User Search for Create

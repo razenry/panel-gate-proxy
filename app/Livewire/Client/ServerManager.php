@@ -29,9 +29,9 @@ class ServerManager extends Component
     /** Backend Game Port (FiveM) — e.g. 30120 */
     public $src_port = 30120;
 
-    public $node_id;
+    public $node_id = '';
 
-    public $subscription_id;
+    public $subscription_id = '';
 
     public $showCreateModal = false;
 
@@ -65,8 +65,8 @@ class ServerManager extends Component
         $this->identifier = '';
         $this->src_ip = '';
         $this->src_port = 30120;
-        $this->node_id = null;
-        $this->subscription_id = $this->subscriptions->first()?->id;
+        $this->node_id = '';
+        $this->subscription_id = '';
     }
 
     public function updatedIdentifier()
