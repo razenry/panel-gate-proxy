@@ -81,12 +81,12 @@ COPY --from=assets /var/www/public/build ./public/build
 RUN composer dump-autoload --no-dev --optimize
 
 # Production configuration
-RUN cp .env.example .env && \
-    php artisan key:generate
+# RUN cp .env.example .env && \
+#     php artisan key:generate
 
-ENV APP_ENV=dev
-ENV APP_DEBUG=true
-ENV LOG_CHANNEL=stderr
+# ENV APP_ENV=development
+# ENV APP_DEBUG=false
+# ENV LOG_CHANNEL=stderr
 
 # Setup permissions for full folder to allow local dev mounts
 RUN chown -R www-data:www-data /var/www
