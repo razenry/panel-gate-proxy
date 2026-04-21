@@ -43,7 +43,7 @@
                         {{ __('Subscriptions') }}
                     </flux:navlist.item>
                     <flux:navlist.item icon="cog-8-tooth" :href="route('admin.settings')" :current="request()->routeIs('admin.settings')" wire:navigate>
-                        {{ __('System Settings') }}
+                        {{ __('Expired Settings') }}
                     </flux:navlist.item>
                 </flux:navlist.group>
             @endif
