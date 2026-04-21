@@ -156,12 +156,12 @@
                     <flux:label badge="Required">Proxy Region</flux:label>
                     <flux:select wire:model.live="node_id" placeholder="Select a region…">
                         @forelse($nodes as $node)
-                            <flux:select.option value="{{ $node->id }}" {{ $node->status === 'offline' ? 'disabled' : '' }}>
+                            <flux:select.option value="{{ $node->id }}" :disabled="$node->status === 'offline'">
                                 {{ $node->label }}
                                 @if($node->status === 'online')
-                                    ✓ Online {{ $node->latency_ms ? "({$node->latency_ms}ms)" : '' }}
+                                    <span class="text-green-500">✓ Online {{ $node->latency_ms ? "({$node->latency_ms}ms)" : '' }}</span>
                                 @else
-                                    ✗ Offline
+                                    <span class="text-red-500">✗ Offline</span>
                                 @endif
                             </flux:select.option>
                         @empty
@@ -185,7 +185,7 @@
                                     $left  = $sub->max_server - $used;
                                     $full  = $left <= 0;
                                 @endphp
-                                <flux:select.option value="{{ $sub->id }}" {{ $full ? 'disabled' : '' }}>
+                                <flux:select.option value="{{ $sub->id }}" :disabled="$full">
                                     {{ $sub->plan_name }} — {{ $left }}/{{ $sub->max_server }} slots
                                     @if($sub->expired_at)
                                         (Exp: {{ $sub->expired_at->locale('id')->translatedFormat('d F Y H:i') }} WIB)
