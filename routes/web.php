@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Admin\ImpersonationController;
 use App\Http\Controllers\SSOController;
+use App\Livewire\Admin\ApiKeyManager;
 use App\Livewire\Admin\Settings;
+use App\Livewire\Admin\SubscriptionManager;
 use App\Livewire\Admin\UserManager;
 use App\Livewire\Client\MyPlan;
 use App\Livewire\Client\ServerDetail;
@@ -29,7 +31,8 @@ Route::middleware(['auth', 'verified', '2fa.enforce'])->group(function () {
         Route::view('plans', 'pages.admin.plans')->name('plans');
         Route::view('servers', 'pages.admin.servers')->name('servers');
         Route::get('users', UserManager::class)->name('users');
-        Route::get('subscriptions', \App\Livewire\Admin\SubscriptionManager::class)->name('subscriptions');
+        Route::get('subscriptions', SubscriptionManager::class)->name('subscriptions');
+        Route::get('api-keys', ApiKeyManager::class)->name('api-keys');
         Route::get('settings', Settings::class)->name('settings');
 
         // Impersonation

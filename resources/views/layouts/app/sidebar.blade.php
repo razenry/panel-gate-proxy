@@ -42,6 +42,9 @@
                     <flux:navlist.item icon="ticket" :href="route('admin.subscriptions')" :current="request()->routeIs('admin.subscriptions')" wire:navigate>
                         {{ __('Subscriptions') }}
                     </flux:navlist.item>
+                    <flux:navlist.item icon="key" :href="route('admin.api-keys')" :current="request()->routeIs('admin.api-keys')" wire:navigate>
+                        {{ __('API Keys') }}
+                    </flux:navlist.item>
                     <flux:navlist.item icon="cog-8-tooth" :href="route('admin.settings')" :current="request()->routeIs('admin.settings')" wire:navigate>
                         {{ __('Expired Settings') }}
                     </flux:navlist.item>
