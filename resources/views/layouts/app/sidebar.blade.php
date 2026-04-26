@@ -8,7 +8,11 @@
 <body class="min-h-screen bg-white dark:bg-zinc-800">
     <flux:sidebar sticky collapsible="mobile" class="bg-zinc-50 dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-700 font-sans">
         <flux:sidebar.header>
-            <flux:brand href="{{ route('dashboard') }}" logo="https://fluxui.com/img/demo/logo.png" name="Raznar Hosting" class="px-2" />
+            <flux:brand href="{{ route('dashboard') }}" name="Raznar Hosting" class="px-2">
+                <x-slot name="logo">
+                    <img src="{{ asset('Raznar1.png') }}" class="dark:invert h-8 w-auto" alt="Raznar Hosting" />
+                </x-slot>
+            </flux:brand>
             <flux:sidebar.collapse class="lg:hidden" />
         </flux:sidebar.header>
 
@@ -55,27 +59,15 @@
         <flux:spacer />
 
         @auth
-            @if(session()->has('impersonated_user_id'))
-                <flux:navlist variant="minimal" class="mb-4">
-                    <form id="impersonate-stop-form" action="{{ route('admin.impersonate.stop') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                    <flux:navlist.item icon="arrow-left-end-on-rectangle" href="#" onclick="event.preventDefault(); document.getElementById('impersonate-stop-form').submit();" class="text-amber-600 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/50">
-                        {{ __('Exit Client Mode') }}
-                    </flux:navlist.item>
-                </flux:navlist>
-            @endif
-
-            @if(session()->has('sso_admin_id'))
-                <flux:navlist variant="minimal" class="mb-4">
-                    <form id="sso-return-form" action="{{ route('sso.return') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                    <flux:navlist.item icon="arrow-uturn-left" href="#" onclick="event.preventDefault(); document.getElementById('sso-return-form').submit();" class="text-orange-600 dark:text-orange-400 font-bold bg-orange-50 dark:bg-orange-950/50">
-                        {{ __('Return to Admin') }}
-                    </flux:navlist.item>
-                </flux:navlist>
-            @endif
+            <form id="impersonate-stop-form" action="{{ route('admin.impersonate.stop') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
+            <form id="sso-return-form" action="{{ route('sso.return') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
 
             <flux:navlist variant="minimal">
                 <flux:navlist.item icon="cog-6-tooth" :href="route('profile.edit')" wire:navigate>{{ __('Settings') }}</flux:navlist.item>
@@ -85,26 +77,42 @@
                 <flux:profile :name="auth()->user()->name" :initials="auth()->user()->initials()" icon-trailing="chevron-up-down" />
 
                 <flux:menu>
-                    @if(auth()->user()->is_admin)
+                    @if(session()->has('impersonated_user_id'))
+                        <flux:menu.item icon="arrow-left-end-on-rectangle" href="#" onclick="event.preventDefault(); document.getElementById('impersonate-stop-form').submit();" class="text-amber-600 dark:text-amber-400">
+                            {{ __('Exit Client Mode') }}
+                        </flux:menu.item>
+                        <flux:menu.separator />
+                    @endif
+
+                    @if(session()->has('sso_admin_id'))
+                        <flux:menu.item icon="arrow-uturn-left" href="#" onclick="event.preventDefault(); document.getElementById('sso-return-form').submit();" class="text-orange-600 dark:text-orange-400">
+                            {{ __('Return to Admin') }}
+                        </flux:menu.item>
+                        <flux:menu.separator />
+                    @endif
+
+                    @if(!session()->has('impersonated_user_id') && auth()->user()->is_admin)
                         <flux:menu.item icon="arrow-path-rounded-square" href="{{ route('admin.impersonate.start', auth()->user()->id) }}">
                             {{ __('Switch to Client Mode') }}
                         </flux:menu.item>
                         <flux:menu.separator />
                     @endif
+
                     <flux:menu.item icon="arrow-right-start-on-rectangle" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         {{ __('Log out') }}
                     </flux:menu.item>
                 </flux:menu>
             </flux:dropdown>
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                @csrf
-            </form>
         @endauth
     </flux:sidebar>
 
     <flux:header class="lg:hidden border-b border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800">
         <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
-        <flux:brand href="{{ route('dashboard') }}" logo="https://fluxui.com/img/demo/logo.png" name="Raznar Hosting" />
+        <flux:brand href="{{ route('dashboard') }}" name="Raznar Hosting">
+            <x-slot name="logo">
+                <img src="{{ asset('Raznar1.png') }}" class="dark:invert h-8 w-auto" alt="Raznar Hosting" />
+            </x-slot>
+        </flux:brand>
         <flux:spacer />
         @auth
             <flux:dropdown position="bottom" align="end">
@@ -112,12 +120,28 @@
                 <flux:menu>
                     <flux:menu.item icon="user" :href="route('profile.edit')" wire:navigate>{{ __('Profile') }}</flux:menu.item>
                     <flux:menu.separator />
-                    @if(auth()->user()->is_admin)
+                    
+                    @if(session()->has('impersonated_user_id'))
+                        <flux:menu.item icon="arrow-left-end-on-rectangle" href="#" onclick="event.preventDefault(); document.getElementById('impersonate-stop-form').submit();" class="text-amber-600 dark:text-amber-400">
+                            {{ __('Exit Client Mode') }}
+                        </flux:menu.item>
+                        <flux:menu.separator />
+                    @endif
+
+                    @if(session()->has('sso_admin_id'))
+                        <flux:menu.item icon="arrow-uturn-left" href="#" onclick="event.preventDefault(); document.getElementById('sso-return-form').submit();" class="text-orange-600 dark:text-orange-400">
+                            {{ __('Return to Admin') }}
+                        </flux:menu.item>
+                        <flux:menu.separator />
+                    @endif
+
+                    @if(!session()->has('impersonated_user_id') && auth()->user()->is_admin)
                         <flux:menu.item icon="arrow-path-rounded-square" href="{{ route('admin.impersonate.start', auth()->user()->id) }}">
                             {{ __('Switch to Client Mode') }}
                         </flux:menu.item>
                         <flux:menu.separator />
                     @endif
+
                     <flux:menu.item
                         icon="arrow-right-start-on-rectangle"
                         href="{{ route('logout') }}"

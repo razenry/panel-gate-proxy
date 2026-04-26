@@ -145,4 +145,21 @@ class NodeService
 
         throw new \RuntimeException("Failed to delete gate {$proxyId} on proxy node {$node->name}: {$error}");
     }
+
+    /**
+     * Delete a node from the database.
+     * Prevents deletion if servers are still attached.
+     * 
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function destroyNode(Node $node): void
+    {
+        if ($node->servers()->exists()) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'node' => 'Cannot delete node while servers are attached.',
+            ]);
+        }
+
+        $node->delete();
+    }
 }

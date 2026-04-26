@@ -44,7 +44,7 @@ class ApiKeyManager extends Component
 
         $expires = ! empty($this->expiresAt) ? Carbon::parse($this->expiresAt) : null;
 
-        $result = $service->createToken($this->description, $expires);
+        $result = $service->createToken($this->description, $expires, auth()->id());
 
         $this->newToken = $result['token'];
         $this->reset(['description', 'expiresAt']);

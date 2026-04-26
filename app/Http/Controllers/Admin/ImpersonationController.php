@@ -47,6 +47,10 @@ class ImpersonationController extends Controller
         $request->session()->forget('impersonated_user_id');
         $request->session()->forget('original_admin_id');
 
+        if ($adminId == $userId) {
+            return redirect()->route('dashboard')->with('status', 'Returned to Admin account.');
+        }
+
         return redirect()->route('admin.users')->with('status', 'Returned to Admin account.');
     }
 }

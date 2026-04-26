@@ -26,7 +26,7 @@ Route::middleware(['auth', 'verified', '2fa.enforce'])->group(function () {
 
     // Admin Routes
     Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
-        Route::view('/', 'pages.admin.index')->name('index');
+        // Route::view('/', 'pages.admin.index')->name('index');
         Route::view('nodes', 'pages.admin.nodes')->name('nodes');
         Route::view('plans', 'pages.admin.plans')->name('plans');
         Route::view('servers', 'pages.admin.servers')->name('servers');

@@ -34,7 +34,7 @@ class SubscriptionService
         }
     }
 
-    protected function activateServers(Subscription $subscription): void
+    public function activateServers(Subscription $subscription): void
     {
         foreach ($subscription->servers as $server) {
             $server->update(['status' => 'pending']);
@@ -42,7 +42,7 @@ class SubscriptionService
         }
     }
 
-    protected function suspendServers(Subscription $subscription): void
+    public function suspendServers(Subscription $subscription): void
     {
         foreach ($subscription->servers as $server) {
             $proxyId = $server->proxy_id ?? "kafka_{$server->identifier}";
@@ -53,7 +53,7 @@ class SubscriptionService
         }
     }
 
-    protected function terminateServers(Subscription $subscription): void
+    public function terminateServers(Subscription $subscription): void
     {
         foreach ($subscription->servers as $server) {
             $proxyId = $server->proxy_id ?? "kafka_{$server->identifier}";
@@ -63,5 +63,27 @@ class SubscriptionService
             $server->delete();
         }
         $subscription->delete();
+    }
+    
+    public function createSubscription(array $data): Subscription
+    {
+        $user = \App\Models\User::firstOrCreate(
+            ['email' => $data['email']],
+            [
+                'name' => $data['name'],
+                'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(16)),
+            ]
+        );
+
+        $plan = \App\Models\Plan::where('name', $data['plan_name'])->firstOrFail();
+
+        return Subscription::create([
+            'user_id' => $user->id,
+            'external_id' => $data['external_id'] ?? null,
+            'plan_name' => $plan->name,
+            'max_server' => $plan->max_server,
+            'status' => $data['status'],
+            'expired_at' => !empty($data['expired_at']) ? \Carbon\CarbonImmutable::parse($data['expired_at']) : null,
+        ]);
     }
 }

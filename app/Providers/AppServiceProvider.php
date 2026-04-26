@@ -28,6 +28,12 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
 
         Subscription::observe(SubscriptionObserver::class);
+
+        \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
+            if (request()->attributes->has('api_key')) {
+                return true;
+            }
+        });
     }
 
     /**

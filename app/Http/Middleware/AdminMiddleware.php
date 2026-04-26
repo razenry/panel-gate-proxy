@@ -13,8 +13,12 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if ($request->attributes->has('api_key')) {
+            return $next($request);
+        }
+
         if (! $request->user() || ! $request->user()->isAdmin()) {
-            abort(403, 'Unauthorized action.');
+            abort(403, 'Unauthorized action. You must be an admin.');
         }
 
         return $next($request);

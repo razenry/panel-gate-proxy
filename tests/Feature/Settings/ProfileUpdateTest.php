@@ -29,13 +29,7 @@ class ProfileUpdateTest extends TestCase
             ->set('email', 'test@example.com')
             ->call('updateProfileInformation');
 
-        $response->assertHasNoErrors();
-
-        $user->refresh();
-
-        $this->assertEquals('Test User', $user->name);
-        $this->assertEquals('test@example.com', $user->email);
-        $this->assertNull($user->email_verified_at);
+        $response->assertHasErrors(['email' => 'Email address cannot be changed.']);
     }
 
     public function test_email_verification_status_is_unchanged_when_email_address_is_unchanged(): void

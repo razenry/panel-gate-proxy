@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreServerRequest;
 use App\Models\Server;
 use App\Services\ServerService;
+use App\Traits\ApiResponses;
 use Illuminate\Http\JsonResponse;
 
 class ServerController extends Controller
 {
+    use ApiResponses;
+
     public function __construct(
         protected ServerService $serverService
     ) {}
@@ -19,12 +22,15 @@ class ServerController extends Controller
      */
     public function index(): JsonResponse
     {
-        $servers = auth()->user()->servers()->with(['node', 'subscription'])->get();
+        $user = auth()->user();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $servers,
-        ]);
+        if (!$user) {
+            return $this->error('Unauthenticated.', 401);
+        }
+
+        $servers = $user->servers()->with(['node', 'subscription'])->get();
+
+        return $this->success($servers);
     }
 
     /**
@@ -39,11 +45,7 @@ class ServerController extends Controller
             $request->validated()
         );
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Server provisioning started.',
-            'data' => $server,
-        ], 201);
+        return $this->success($server, 'Server provisioning started.', 201);
     }
 
     /**
@@ -53,10 +55,7 @@ class ServerController extends Controller
     {
         $this->authorize('view', $server);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $server->load(['node', 'subscription']),
-        ]);
+        return $this->success($server->load(['node', 'subscription']));
     }
 
     /**
@@ -68,9 +67,6 @@ class ServerController extends Controller
 
         $this->serverService->delete($server);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Server termination started.',
-        ]);
+        return $this->success(null, 'Server termination started.');
     }
 }
