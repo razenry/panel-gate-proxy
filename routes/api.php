@@ -11,7 +11,9 @@ Route::get('/user', function (Request $request) {
 
 Route::middleware(['ip_whitelist', 'api_key'])->group(function () {
     // Client endpoints
-    Route::apiResource('servers', ServerController::class)->except(['update']);
+    Route::name('api.client.')->group(function () {
+        Route::apiResource('servers', ServerController::class)->except(['update']);
+    });
 
     // Admin endpoints
     Route::middleware(['admin'])->prefix('admin')->name('api.admin.')->group(function () {
