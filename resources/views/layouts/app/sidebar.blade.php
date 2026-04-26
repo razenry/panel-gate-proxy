@@ -10,7 +10,7 @@
         <flux:sidebar.header>
             <flux:brand href="{{ route('dashboard') }}" name="Raznar Hosting" class="px-2">
                 <x-slot name="logo">
-                    <img src="{{ asset('Raznar1.png') }}" class="dark:invert h-8 w-auto" alt="Raznar Hosting" />
+                    <img src="{{ asset('Raznar1.png') }}" class="h-8 w-auto" alt="Raznar Hosting" />
                 </x-slot>
             </flux:brand>
             <flux:sidebar.collapse class="lg:hidden" />
@@ -110,7 +110,7 @@
         <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
         <flux:brand href="{{ route('dashboard') }}" name="Raznar Hosting">
             <x-slot name="logo">
-                <img src="{{ asset('Raznar1.png') }}" class="dark:invert h-8 w-auto" alt="Raznar Hosting" />
+                <img src="{{ asset('Raznar1.png') }}" class="h-8 w-auto" alt="Raznar Hosting" />
             </x-slot>
         </flux:brand>
         <flux:spacer />
