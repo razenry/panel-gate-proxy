@@ -25,6 +25,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (config('app.url')) {
+            \URL::forceRootUrl(config('app.url'));
+        }
         $this->configureDefaults();
 
         Subscription::observe(SubscriptionObserver::class);

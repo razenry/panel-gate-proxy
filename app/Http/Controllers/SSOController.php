@@ -7,9 +7,14 @@ use App\Services\SSOService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use App\Services\Integration\PaymenterService;
+
 class SSOController extends Controller
 {
-    public function __construct(protected SSOService $ssoService) {}
+    public function __construct(
+        protected SSOService $ssoService,
+        protected PaymenterService $paymenterService
+    ) {}
 
     /**
      * Handle SSO login via JWT token.
@@ -24,14 +29,23 @@ class SSOController extends Controller
 
         $payload = $this->ssoService->validateToken($token);
 
-        if (! $payload || empty($payload['user_id'])) {
+        if (! $payload) {
             return redirect()->route('login')->with('error', 'Invalid or expired SSO token.');
         }
 
-        $user = User::find($payload['user_id']);
+        if (isset($payload['email'])) {
+            $user = $this->paymenterService->syncUser([
+                'email' => $payload['email'],
+                'name' => $payload['name'] ?? null,
+            ]);
+        } elseif (isset($payload['user_id'])) {
+            $user = User::find($payload['user_id']);
+        } else {
+            $user = null;
+        }
 
         if (! $user) {
-            return redirect()->route('login')->with('error', 'User not found.');
+            return redirect()->route('login')->with('error', 'User not found or could not be synced.');
         }
 
         Auth::login($user);

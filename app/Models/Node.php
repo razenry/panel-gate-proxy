@@ -19,6 +19,7 @@ class Node extends Model
         'api_url',
         'api_token',
         'status',
+        'type',
         'latency_ms',
         'last_checked_at',
     ];

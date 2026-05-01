@@ -7,7 +7,9 @@ use App\Jobs\ProvisionServerJob;
 use App\Models\Server;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\Node;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class ServerService
@@ -31,21 +33,28 @@ class ServerService
             throw ValidationException::withMessages(['subscription' => 'Server limit reached for this subscription.']);
         }
 
-        return DB::transaction(function () use ($user, $data, $subscription) {
-            // Generate random proxy port (now mandatory to be random as per requirement)
-            $destPort = $this->generateRandomPort($data['node_id']);
+        $node = Node::findOrFail($data['node_id']);
 
-            $server = Server::create([
+        return DB::transaction(function () use ($user, $data, $subscription, $node) {
+            $provisioningType = ($node->type === 'pterodactyl') ? 'pterodactyl' : 'proxy';
+
+            $serverData = [
                 'user_id' => $user->id,
                 'label' => $data['label'],
                 'identifier' => strtolower($data['identifier']),
-                'src_ip' => $data['src_ip'],
-                'src_port' => $data['src_port'],   // backend port (e.g. 30120)
-                'dest_port' => $destPort,          // NGINX proxy listening port (random)
-                'node_id' => $data['node_id'],
+                'src_ip' => $data['src_ip'] ?? '0.0.0.0',
+                'src_port' => $data['src_port'] ?? 0,
+                'node_id' => $node->id,
                 'subscription_id' => $subscription->id,
                 'status' => 'pending',
-            ]);
+                'provisioning_type' => $provisioningType,
+            ];
+
+            if ($provisioningType === 'proxy') {
+                $serverData['dest_port'] = $this->generateRandomPort($node->id);
+            }
+
+            $server = Server::create($serverData);
 
             ProvisionServerJob::dispatch($server);
 
@@ -58,12 +67,15 @@ class ServerService
      */
     public function delete(Server $server): void
     {
-        // Pass Node and proxy_id directly because we delete the Server model immediately.
-        // If we passed the Server model, the queued job would fail to unserialize it.
-        $proxyId = $server->proxy_id ?? "kafka_{$server->identifier}";
+        Log::info('[Server] Deleting server', ['id' => $server->id, 'type' => $server->provisioning_type]);
 
-        if ($server->node_id) {
-            DeleteServerJob::dispatch($server->node, $proxyId);
+        if ($server->provisioning_type === 'pterodactyl' && $server->external_id) {
+            app(PterodactylService::class)->deleteServer((int) $server->external_id);
+        } else {
+            $proxyId = $server->proxy_id ?? "kafka_{$server->identifier}";
+            if ($server->node_id && $server->node) {
+                DeleteServerJob::dispatch($server->node, $proxyId);
+            }
         }
 
         $server->delete();
@@ -79,16 +91,31 @@ class ServerService
     }
 
     /**
-     * Suspend all servers for a subscription (trigger proxy deletion but keep DB records).
+     * Suspend a server.
      */
-    public function suspend(Subscription $subscription): void
+    public function suspend(Server $server): void
     {
-        foreach ($subscription->servers as $server) {
+        Log::info('[Server] Suspending server', ['id' => $server->id]);
+
+        if ($server->provisioning_type === 'pterodactyl' && $server->external_id) {
+            app(PterodactylService::class)->setSuspension((int) $server->external_id, true);
+        } else {
             $proxyId = $server->proxy_id ?? "kafka_{$server->identifier}";
-            if ($server->node_id) {
+            if ($server->node_id && $server->node) {
                 DeleteServerJob::dispatch($server->node, $proxyId);
             }
-            $server->update(['status' => 'suspended']);
+        }
+        
+        $server->update(['status' => 'suspended']);
+    }
+
+    /**
+     * Suspend all servers for a subscription (trigger proxy deletion but keep DB records).
+     */
+    public function suspendAll(Subscription $subscription): void
+    {
+        foreach ($subscription->servers as $server) {
+            $this->suspend($server);
         }
     }
 

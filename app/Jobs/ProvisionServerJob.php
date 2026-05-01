@@ -3,7 +3,9 @@
 namespace App\Jobs;
 
 use App\Models\Server;
+use App\Models\Setting;
 use App\Services\NodeService;
+use App\Services\PterodactylService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -40,7 +42,7 @@ class ProvisionServerJob implements ShouldQueue
      * The browser never waits — it gets an instant "Pending" response.
      * The Livewire component polls every 5s and updates when status changes to "active".
      */
-    public function handle(NodeService $nodeService): void
+    public function handle(NodeService $nodeService, PterodactylService $pterodactylService): void
     {
         $context = [
             'server_id'  => $this->server->id,
@@ -68,30 +70,43 @@ class ProvisionServerJob implements ShouldQueue
         ]);
 
         try {
-            Log::info('[Provision] Calling NodeService::createProxy…', $context);
+            if ($this->server->provisioning_type === 'pterodactyl') {
+                Log::info('[Provision] Calling PterodactylService::createServer…', $context);
+                
+                $pterodactylData = $pterodactylService->createServer([
+                    'label' => $this->server->label,
+                    // Additional defaults could be mapped here if needed from Node settings
+                ]);
 
-            // NodeService::createProxy returns the domain string on success,
-            // or throws RuntimeException / ConnectionException on failure.
-            $domain = $nodeService->createProxy(
-                $this->server->node,
-                $this->server->identifier,
-                $this->server->src_ip,    // FiveM server IP (backend)
-                $this->server->src_port,  // FiveM server port (backend)
-                $this->server->dest_port  // NGINX proxy listening port
-            );
+                $this->server->update([
+                    'external_id' => $pterodactylData['id'],
+                    'status' => 'active',
+                    'domain' => $pterodactylData['identifier'] . '.' . parse_url(Setting::get('pterodactyl_url'), PHP_URL_HOST), // Fallback domain info
+                ]);
+            } else {
+                Log::info('[Provision] Calling NodeService::createProxy…', $context);
 
-            Log::info('[Provision] createProxy returned domain', ['domain' => $domain]);
+                // NodeService::createProxy returns the domain string on success,
+                // or throws RuntimeException / ConnectionException on failure.
+                $domain = $nodeService->createProxy(
+                    $this->server->node,
+                    $this->server->identifier,
+                    $this->server->src_ip,    // FiveM server IP (backend)
+                    $this->server->src_port,  // FiveM server port (backend)
+                    $this->server->dest_port  // NGINX proxy listening port
+                );
 
-            // Store gate ID and the exact domain returned by Golang
-            $this->server->update([
-                'proxy_id' => "kafka_{$this->server->identifier}",
-                'domain'   => $domain,   // e.g. "kafka_gate.raznar.net"
-                'status'   => 'active',
-            ]);
+                Log::info('[Provision] createProxy returned domain', ['domain' => $domain]);
 
-            Log::info('[Provision] SUCCESS — server is now active', array_merge($context, [
-                'domain' => $domain,
-            ]));
+                // Store gate ID and the exact domain returned by Golang
+                $this->server->update([
+                    'proxy_id' => "kafka_{$this->server->identifier}",
+                    'domain'   => $domain,   // e.g. "kafka_gate.raznar.net"
+                    'status'   => 'active',
+                ]);
+            }
+
+            Log::info('[Provision] SUCCESS — server is now active', $context);
         } catch (ConnectionException $e) {
             // Network/timeout error → retry once after 30s (stays as "pending" during retry)
             Log::warning('[Provision] CONNECTION TIMEOUT — will retry', array_merge($context, [

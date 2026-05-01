@@ -24,7 +24,9 @@ class Server extends Model
         'node_id',
         'subscription_id',
         'status',
+        'provisioning_type',
         'domain',
+        'external_id',
     ];
 
     /**

@@ -43,14 +43,24 @@ class SSOService
     /**
      * Validate an SSO JWT token and return the payload details.
      * 
-     * @return array{user_id: int, admin_id?: int}|null
+     * @return array|null
      */
     public function validateToken(string $token): ?array
     {
         try {
             $decoded = JWT::decode($token, new Key($this->secretKey, 'HS256'));
 
-            $result = ['user_id' => (int) $decoded->sub];
+            $result = [];
+            
+            if (isset($decoded->sub)) {
+                $result['user_id'] = (int) $decoded->sub;
+            }
+            if (isset($decoded->email)) {
+                $result['email'] = $decoded->email;
+            }
+            if (isset($decoded->name)) {
+                $result['name'] = $decoded->name;
+            }
             if (isset($decoded->admin_id)) {
                 $result['admin_id'] = (int) $decoded->admin_id;
             }

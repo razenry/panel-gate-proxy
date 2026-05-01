@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: laravel-app
+    container_name: panel-app
     restart: unless-stopped
     tty: true
     working_dir: /var/www
@@ -20,7 +20,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: web
-    container_name: laravel-web
+    container_name: panel-web
     restart: unless-stopped
     tty: true
     ports:
@@ -38,7 +38,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: laravel-worker
+    container_name: panel-worker
     restart: unless-stopped
     command: php artisan queue:work --tries=3 --timeout=360
     working_dir: /var/www

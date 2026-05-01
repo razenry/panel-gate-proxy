@@ -5,15 +5,18 @@ namespace App\Services;
 use App\Jobs\DeleteServerJob;
 use App\Jobs\ProvisionServerJob;
 use App\Models\Subscription;
+use Illuminate\Support\Facades\Log;
 
 class SubscriptionService
 {
-    /**
-     * Handle status change of a subscription.
-     */
     public function handleStatusChange(Subscription $subscription, string $oldStatus): void
     {
         $newStatus = $subscription->status;
+        Log::info('[Subscription] Status changed', [
+            'id' => $subscription->id,
+            'old' => $oldStatus,
+            'new' => $newStatus
+        ]);
 
         if ($newStatus === 'active') {
             $this->activateServers($subscription);
@@ -44,25 +47,26 @@ class SubscriptionService
 
     public function suspendServers(Subscription $subscription): void
     {
+        Log::info('[Subscription] Suspending all servers', ['subscription_id' => $subscription->id]);
         foreach ($subscription->servers as $server) {
-            $proxyId = $server->proxy_id ?? "kafka_{$server->identifier}";
-            if ($server->node_id && $server->node) {
-                DeleteServerJob::dispatch($server->node, $proxyId);
-            }
-            $server->update(['status' => 'suspended']);
+            if ($server->status === 'suspended') continue;
+            
+            app(\App\Services\ServerService::class)->suspend($server);
         }
     }
 
     public function terminateServers(Subscription $subscription): void
     {
+        Log::warning('[Subscription] Terminating all servers and data', ['subscription_id' => $subscription->id]);
         foreach ($subscription->servers as $server) {
-            $proxyId = $server->proxy_id ?? "kafka_{$server->identifier}";
-            if ($server->node_id && $server->node) {
-                DeleteServerJob::dispatch($server->node, $proxyId);
-            }
-            $server->delete();
+            app(\App\Services\ServerService::class)->delete($server);
         }
-        $subscription->delete();
+        
+        // We keep the subscription record but marked as terminated if it's already updated, 
+        // or we can delete it if that's the preferred way. The PaymenterService currently 
+        // updates status to 'terminated' then calls this.
+        // To strictly follow "Set status to terminated", we won't delete the subscription record itself here.
+        Log::info('[Subscription] Termination complete', ['subscription_id' => $subscription->id]);
     }
     
     public function createSubscription(array $data): Subscription

@@ -23,5 +23,14 @@ Route::middleware(['ip_whitelist', 'api_key'])->group(function () {
         Route::apiResource('subscriptions', \App\Http\Controllers\Api\Admin\SubscriptionController::class);
         Route::apiResource('servers', \App\Http\Controllers\Api\Admin\ServerController::class)->except(['update']);
         Route::post('servers/{server}/redeploy', [\App\Http\Controllers\Api\Admin\ServerController::class, 'redeploy'])->name('servers.redeploy');
+        
+        // External Integration API (Generic)
+        Route::prefix('external')->name('external.')->group(function () {
+            Route::post('users/sync', [\App\Http\Controllers\Api\External\UserSyncController::class, 'sync']);
+            Route::post('subscriptions/sync', [\App\Http\Controllers\Api\External\SubscriptionSyncController::class, 'sync']);
+            Route::post('subscriptions/{external_id}/activate', [\App\Http\Controllers\Api\External\SubscriptionSyncController::class, 'activate']);
+            Route::post('subscriptions/{external_id}/suspend', [\App\Http\Controllers\Api\External\SubscriptionSyncController::class, 'suspend']);
+            Route::post('subscriptions/{external_id}/terminate', [\App\Http\Controllers\Api\External\SubscriptionSyncController::class, 'terminate']);
+        });
     });
 });
