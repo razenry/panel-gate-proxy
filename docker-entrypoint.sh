@@ -36,6 +36,8 @@ echo "🚀 Starting process: $@"
 # Verify php-fpm can start
 if [ "$1" = 'php-fpm' ]; then
     echo "ℹ️ php-fpm will listen on port 9000"
+    # Debug: Check if something is already listening
+    netstat -plntu || echo "⚠️ netstat not available"
     exec "$@"
 else
     # For other commands (like artisan), run as www-data

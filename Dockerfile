@@ -61,7 +61,8 @@ RUN apk add --no-cache \
     icu-dev \
     nodejs \
     npm \
-    su-exec
+    su-exec \
+    net-tools
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd intl
