@@ -60,7 +60,8 @@ RUN apk add --no-cache \
     oniguruma-dev \
     icu-dev \
     nodejs \
-    npm
+    npm \
+    su-exec
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd intl
@@ -93,10 +94,11 @@ RUN chown -R www-data:www-data /var/www
 
 # Copy Entrypoint
 COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh && \
+    sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh
 
 # Change user to www-data for FPM
-USER www-data
+# USER www-data
 
 # Expose port 9000
 EXPOSE 9000
