@@ -66,6 +66,10 @@ RUN apk add --no-cache \
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd intl
 
+# Copy custom PHP configuration
+COPY docker/php/local.ini /usr/local/etc/php/conf.d/local.ini
+COPY docker/php/zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf
+
 # Install Composer (needed for dump-autoload)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
