@@ -22,13 +22,18 @@ class ExternalIntegrationService
      */
     public function syncUser(array $data): User
     {
-        return User::firstOrCreate(
-            ['email' => $data['email']],
-            [
-                'name' => $data['name'] ?? explode('@', $data['email'])[0],
-                'password' => Hash::make(Str::random(16)),
-            ]
-        );
+        $user = User::where('email', $data['email'])->first();
+
+        if ($user) {
+            $user->update(['name' => $data['name'] ?? $user->name]);
+            return $user;
+        }
+
+        return User::create([
+            'email' => $data['email'],
+            'name' => $data['name'] ?? explode('@', $data['email'])[0],
+            'password' => Hash::make(Str::random(16)),
+        ]);
     }
 
     /**
