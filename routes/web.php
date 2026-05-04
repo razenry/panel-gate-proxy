@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/dashboard')->name('home');
 
 // SSO Routes
-Route::get('sso/login', [\App\Http\Controllers\Auth\SSOController::class, 'login'])->name('sso.login');
+Route::get('sso/login', [App\Http\Controllers\Auth\SSOController::class, 'login'])->name('sso.login');
 
 Route::post('sso/return', [SSOController::class, 'returnToAdmin'])->name('sso.return');
 
@@ -29,7 +29,9 @@ Route::middleware(['auth', 'verified', '2fa.enforce'])->group(function () {
     Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
         // Route::view('/', 'pages.admin.index')->name('index');
         Route::view('nodes', 'pages.admin.nodes')->name('nodes');
+        Route::view('locations', 'pages.admin.locations')->name('locations');
         Route::view('plans', 'pages.admin.plans')->name('plans');
+
         Route::view('servers', 'pages.admin.servers')->name('servers');
         Route::get('users', UserManager::class)->name('users');
         Route::get('subscriptions', SubscriptionManager::class)->name('subscriptions');

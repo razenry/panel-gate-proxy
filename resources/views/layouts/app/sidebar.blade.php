@@ -34,6 +34,10 @@
                     <flux:navlist.item icon="cpu-chip" :href="route('admin.nodes')" :current="request()->routeIs('admin.nodes')" wire:navigate>
                         {{ __('Nodes') }}
                     </flux:navlist.item>
+                    <flux:navlist.item icon="map-pin" :href="route('admin.locations')" :current="request()->routeIs('admin.locations')" wire:navigate>
+                        {{ __('Locations') }}
+                    </flux:navlist.item>
+
                     <flux:navlist.item icon="credit-card" :href="route('admin.plans')" :current="request()->routeIs('admin.plans')" wire:navigate>
                         {{ __('Plans') }}
                     </flux:navlist.item>
