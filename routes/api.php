@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Admin\LocationController;
 use App\Http\Controllers\Api\Admin\NodeController;
+use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\Client\AccountController;
 use App\Http\Controllers\Api\Client\ActivityController;
 use App\Http\Controllers\Api\Client\ApiKeyController;
@@ -56,6 +57,7 @@ Route::middleware(['api_key'])->group(function () {
 
     // Admin endpoints
     Route::middleware(['admin'])->prefix('admin')->name('api.admin.')->group(function () {
+        Route::apiResource('users', AdminUserController::class);
         Route::apiResource('nodes', NodeController::class);
 
         // Expose generic tools for Paymenter
