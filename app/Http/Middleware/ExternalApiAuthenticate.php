@@ -23,15 +23,9 @@ class ExternalApiAuthenticate
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        // 2. Check IP Whitelist
-        $ipWhitelist = config('external_api.whitelist');
-        $clientIp = $request->ip();
-
-        if (!empty($ipWhitelist) && !in_array($clientIp, $ipWhitelist) && !in_array('*', $ipWhitelist)) {
-            logger()->warning('Blocked external API request from unauthorized IP: ' . $clientIp);
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
+        // 2. Check IP Whitelist (REMOVED)
 
         return $next($request);
+
     }
 }

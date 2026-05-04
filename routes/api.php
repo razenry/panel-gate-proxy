@@ -7,23 +7,24 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
-})->middleware(['ip_whitelist', 'api_key']);
+})->middleware(['api_key']);
 
-Route::middleware(['ip_whitelist', 'api_key'])->group(function () {
+
+// External Integration API for Paymenter
+Route::middleware(['external_api'])->prefix('external')->name('external.')->group(function () {
+    Route::post('users/sync', [\App\Http\Controllers\Api\External\UserController::class, 'sync']);
+    Route::post('subscriptions/sync', [\App\Http\Controllers\Api\External\SubscriptionController::class, 'sync']);
+    Route::post('subscriptions/activate', [\App\Http\Controllers\Api\External\SubscriptionController::class, 'activate']);
+    Route::post('subscriptions/suspend', [\App\Http\Controllers\Api\External\SubscriptionController::class, 'suspend']);
+    Route::post('subscriptions/terminate', [\App\Http\Controllers\Api\External\SubscriptionController::class, 'terminate']);
+});
+
+Route::middleware(['api_key'])->group(function () {
+
     // Client endpoints
     Route::name('api.client.')->group(function () {
         Route::apiResource('servers', ServerController::class)->except(['update']);
     });
-
-    // External Integration API for Paymenter
-    Route::middleware(['external_api'])->prefix('external')->name('external.')->group(function () {
-        Route::post('users/sync', [\App\Http\Controllers\Api\External\UserController::class, 'sync']);
-        Route::post('subscriptions/sync', [\App\Http\Controllers\Api\External\SubscriptionController::class, 'sync']);
-        Route::post('subscriptions/activate', [\App\Http\Controllers\Api\External\SubscriptionController::class, 'activate']);
-        Route::post('subscriptions/suspend', [\App\Http\Controllers\Api\External\SubscriptionController::class, 'suspend']);
-        Route::post('subscriptions/terminate', [\App\Http\Controllers\Api\External\SubscriptionController::class, 'terminate']);
-    });
-
 
     // Admin endpoints
     Route::middleware(['admin'])->prefix('admin')->name('api.admin.')->group(function () {
