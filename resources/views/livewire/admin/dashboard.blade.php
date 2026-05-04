@@ -157,18 +157,20 @@
                         <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
                             @forelse($recentServers as $s)
                                 <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
-                                    <td class="py-2.5 font-mono text-xs text-blue-600 dark:text-blue-400">{{ $s['identifier'] }}</td>
-                                    <td class="py-2.5 text-xs text-zinc-500">{{ $s['user']['name'] ?? '—' }}</td>
-                                    <td class="py-2.5 text-xs text-zinc-500">{{ $s['node']['label'] ?? '—' }}</td>
+                                    <td class="py-2.5 font-mono text-xs text-blue-600 dark:text-blue-400">{{ $s->identifier }}</td>
+                                    <td class="py-2.5 text-xs text-zinc-500">{{ $s->user->name ?? '—' }}</td>
+                                    <td class="py-2.5 text-xs text-zinc-500">{{ $s->node->label ?? '—' }}</td>
+
                                     <td class="py-2.5">
-                                        @if($s['status'] === 'active')
+                                        @if($s->status === 'active')
                                             <flux:badge color="green" size="sm" variant="pill">Active</flux:badge>
-                                        @elseif($s['status'] === 'pending')
+                                        @elseif($s->status === 'pending')
                                             <flux:badge color="yellow" size="sm" variant="pill">Provisioning</flux:badge>
                                         @else
                                             <flux:badge color="red" size="sm" variant="pill">Failed</flux:badge>
                                         @endif
                                     </td>
+
                                 </tr>
                             @empty
                                 <tr>

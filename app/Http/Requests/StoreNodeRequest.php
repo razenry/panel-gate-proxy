@@ -27,6 +27,8 @@ class StoreNodeRequest extends FormRequest
             'label' => ['required', 'string', 'max:255'],
             'api_url' => ['required', 'url'],
             'api_token' => ['required', 'string'],
+            'location_id' => ['required', 'exists:locations,id'],
         ];
+
     }
 }

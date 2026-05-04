@@ -26,10 +26,16 @@
                                 <flux:icon icon="cpu-chip" size="sm" class="text-zinc-400" />
                                 <div>
                                     <div class="font-medium">{{ $node->label }}</div>
-                                    <div class="text-xs text-zinc-500 font-mono">{{ $node->name }}</div>
+                                    <div class="text-[10px] text-zinc-500 font-mono flex items-center gap-1">
+                                        <flux:icon icon="map-pin" size="micro" />
+                                        {{ $node->location->short ?? 'No Loc' }}
+                                        <span class="mx-1">•</span>
+                                        {{ $node->name }}
+                                    </div>
                                 </div>
                             </div>
                         </flux:table.cell>
+
                         <flux:table.cell class="hidden md:table-cell font-mono text-xs text-zinc-500">
                             {{ $node->api_url }}
                         </flux:table.cell>
@@ -70,6 +76,16 @@
                 <flux:heading size="lg">{{ $editingNodeId ? 'Edit Node' : 'Register Node' }}</flux:heading>
                 <flux:subheading>Update connection details for this infrastructure point.</flux:subheading>
             </div>
+
+            <flux:field>
+                <flux:label>Location</flux:label>
+                <flux:select wire:model="location_id" placeholder="Choose a region...">
+                    @foreach($locations as $loc)
+                        <flux:select.option value="{{ $loc->id }}">{{ $loc->short }} — {{ $loc->long }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+                <flux:error name="location_id" />
+            </flux:field>
 
             <flux:field>
                 <flux:label>Identifier (Slug)</flux:label>

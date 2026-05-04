@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\Location;
 use App\Models\Node;
 use App\Services\NodeService;
 use Flux\Flux;
@@ -20,6 +21,8 @@ class NodeManager extends Component
     public $api_url;
 
     public $api_token;
+
+    public $location_id;
 
     public $editingNodeId;
 
@@ -51,7 +54,9 @@ class NodeManager extends Component
         $this->description = '';
         $this->api_url = '';
         $this->api_token = '';
+        $this->location_id = '';
         $this->editingNodeId = null;
+
     }
 
     public function openModal($id = null)
@@ -65,7 +70,9 @@ class NodeManager extends Component
             $this->description = $node->description;
             $this->api_url = $node->api_url;
             $this->api_token = $node->api_token;
+            $this->location_id = $node->location_id;
         }
+
         $this->showModal = true;
     }
 
@@ -76,6 +83,7 @@ class NodeManager extends Component
             'label' => 'required',
             'api_url' => 'required|url',
             'api_token' => 'required',
+            'location_id' => 'required|exists:locations,id',
         ]);
 
         Node::updateOrCreate(
@@ -86,7 +94,9 @@ class NodeManager extends Component
                 'description' => $this->description,
                 'api_url' => $this->api_url,
                 'api_token' => $this->api_token,
+                'location_id' => $this->location_id,
             ]
+
         );
 
         $this->showModal = false;
@@ -158,6 +168,8 @@ class NodeManager extends Component
 
     public function render()
     {
-        return view('livewire.admin.node-manager');
+        return view('livewire.admin.node-manager', [
+            'locations' => Location::all(),
+        ]);
     }
 }

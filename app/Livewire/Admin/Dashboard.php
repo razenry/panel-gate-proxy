@@ -40,8 +40,8 @@ class Dashboard extends Component
         return Server::with(['user', 'node'])
             ->latest()
             ->take(8)
-            ->get()
-            ->toArray();
+            ->get();
+
     }
 
     /**

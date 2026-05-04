@@ -27,6 +27,8 @@ class UpdateNodeRequest extends FormRequest
             'label' => ['required', 'string', 'max:255'],
             'api_url' => ['required', 'url'],
             'api_token' => ['nullable', 'string'], // Nullable on update
+            'location_id' => ['required', 'exists:locations,id'],
         ];
+
     }
 }

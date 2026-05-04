@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\NodeFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Node extends Model
@@ -22,7 +23,16 @@ class Node extends Model
         'type',
         'latency_ms',
         'last_checked_at',
+        'location_id',
     ];
+
+    /**
+     * Get the location that the node belongs to.
+     */
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
+    }
 
     protected function casts(): array
     {

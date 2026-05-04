@@ -15,6 +15,16 @@ class Location extends Model
         'long',
     ];
 
+    protected $appends = ['label'];
+
+    /**
+     * Alias long as label for compatibility with external systems.
+     */
+    public function getLabelAttribute(): string
+    {
+        return $this->long;
+    }
+
     /**
      * Get the nodes for the location.
      */
