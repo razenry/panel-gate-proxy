@@ -16,11 +16,13 @@ class Subscription extends Model
     protected $fillable = [
         'user_id',
         'external_id',
+        'plan_id',
         'plan_name',
         'max_server',
         'status',
         'expired_at',
     ];
+
 
     /**
      * Get the attributes that should be cast.

@@ -16,9 +16,10 @@ class SSOService
 
     public function __construct()
     {
-        $this->secretKey = Setting::get('sso_secret', config('app.key'));
-        $this->ttl = (int) Setting::get('sso_ttl', 120);
+        $this->secretKey = config('external_api.jwt_secret') ?: Setting::get('sso_secret', config('app.key'));
+        $this->ttl = (int) Setting::get('sso_ttl', 300);
     }
+
 
     /**
      * Generate an SSO JWT token for a user.

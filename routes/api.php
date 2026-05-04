@@ -15,14 +15,15 @@ Route::middleware(['ip_whitelist', 'api_key'])->group(function () {
         Route::apiResource('servers', ServerController::class)->except(['update']);
     });
 
-    // External Integration API (Generic) - Moved outside admin prefix
-    Route::prefix('external')->name('external.')->group(function () {
-        Route::post('users/sync', [\App\Http\Controllers\Api\External\UserSyncController::class, 'sync']);
-        Route::post('subscriptions/sync', [\App\Http\Controllers\Api\External\SubscriptionSyncController::class, 'sync']);
-        Route::post('subscriptions/{external_id}/activate', [\App\Http\Controllers\Api\External\SubscriptionSyncController::class, 'activate']);
-        Route::post('subscriptions/{external_id}/suspend', [\App\Http\Controllers\Api\External\SubscriptionSyncController::class, 'suspend']);
-        Route::post('subscriptions/{external_id}/terminate', [\App\Http\Controllers\Api\External\SubscriptionSyncController::class, 'terminate']);
+    // External Integration API for Paymenter
+    Route::middleware(['external_api'])->prefix('external')->name('external.')->group(function () {
+        Route::post('users/sync', [\App\Http\Controllers\Api\External\UserController::class, 'sync']);
+        Route::post('subscriptions/sync', [\App\Http\Controllers\Api\External\SubscriptionController::class, 'sync']);
+        Route::post('subscriptions/activate', [\App\Http\Controllers\Api\External\SubscriptionController::class, 'activate']);
+        Route::post('subscriptions/suspend', [\App\Http\Controllers\Api\External\SubscriptionController::class, 'suspend']);
+        Route::post('subscriptions/terminate', [\App\Http\Controllers\Api\External\SubscriptionController::class, 'terminate']);
     });
+
 
     // Admin endpoints
     Route::middleware(['admin'])->prefix('admin')->name('api.admin.')->group(function () {

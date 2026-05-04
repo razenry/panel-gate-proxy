@@ -29,7 +29,9 @@ return Application::configure(basePath: dirname(__DIR__))
             '2fa.enforce' => EnforceTwoFactor::class,
             'ip_whitelist' => IpWhitelist::class,
             'api_key' => ApiKeyAuthenticate::class,
+            'external_api' => \App\Http\Middleware\ExternalApiAuthenticate::class,
         ]);
+
 
         $middleware->appendToGroup('web', [
             Impersonate::class,

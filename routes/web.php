@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/dashboard')->name('home');
 
 // SSO Routes
-Route::get('sso/login', [SSOController::class, 'login'])->name('sso.login');
+Route::get('sso/login', [\App\Http\Controllers\Auth\SSOController::class, 'login'])->name('sso.login');
+
 Route::post('sso/return', [SSOController::class, 'returnToAdmin'])->name('sso.return');
 
 Route::middleware(['auth', 'verified', '2fa.enforce'])->group(function () {
