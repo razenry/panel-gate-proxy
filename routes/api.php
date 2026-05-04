@@ -51,12 +51,12 @@ Route::middleware(['api_key'])->group(function () {
     // Admin endpoints
     Route::middleware(['admin'])->prefix('admin')->name('api.admin.')->group(function () {
         Route::apiResource('nodes', NodeController::class);
-        Route::apiResource('locations', \App\Http\Controllers\Api\Admin\LocationController::class);
         
         // Expose generic tools for Paymenter
         Route::apiResource('subscriptions', \App\Http\Controllers\Api\Admin\SubscriptionController::class);
         Route::apiResource('servers', \App\Http\Controllers\Api\Admin\ServerController::class)->except(['update']);
         Route::post('servers/{server}/redeploy', [\App\Http\Controllers\Api\Admin\ServerController::class, 'redeploy'])->name('servers.redeploy');
+
         
         // Minecraft Management API
         Route::prefix('minecraft/servers/{server}')->name('minecraft.')->group(function () {
