@@ -30,6 +30,10 @@ class UserController extends Controller
         $data = $request->validated();
         $data['password'] = Hash::make($data['password']);
 
+        if (empty($data['name']) && (! empty($data['first_name']) || ! empty($data['last_name']))) {
+            $data['name'] = trim(($data['first_name'] ?? '').' '.($data['last_name'] ?? ''));
+        }
+
         $user = User::create($data);
 
         return $this->success($user, 'User created successfully.', 201);
@@ -52,6 +56,10 @@ class UserController extends Controller
 
         if (isset($data['password'])) {
             $data['password'] = Hash::make($data['password']);
+        }
+
+        if (empty($data['name']) && (! empty($data['first_name']) || ! empty($data['last_name']))) {
+            $data['name'] = trim(($data['first_name'] ?? $user->first_name).' '.($data['last_name'] ?? $user->last_name));
         }
 
         $user->update($data);
