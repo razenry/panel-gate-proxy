@@ -22,9 +22,31 @@ Route::middleware(['external_api'])->prefix('external')->name('external.')->grou
 Route::middleware(['api_key'])->group(function () {
 
     // Client endpoints
-    Route::name('api.client.')->group(function () {
+    Route::prefix('client')->name('api.client.')->group(function () {
         Route::apiResource('servers', ServerController::class)->except(['update']);
+
+        // Account & Security
+        Route::prefix('account')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\Client\AccountController::class, 'index']);
+            Route::put('email', [\App\Http\Controllers\Api\Client\AccountController::class, 'updateEmail']);
+            Route::put('password', [\App\Http\Controllers\Api\Client\AccountController::class, 'updatePassword']);
+
+            Route::get('two-factor', [\App\Http\Controllers\Api\Client\TwoFactorController::class, 'index']);
+            Route::post('two-factor', [\App\Http\Controllers\Api\Client\TwoFactorController::class, 'store']);
+            Route::delete('two-factor', [\App\Http\Controllers\Api\Client\TwoFactorController::class, 'destroy']);
+
+            Route::get('api-keys', [\App\Http\Controllers\Api\Client\ApiKeyController::class, 'index']);
+            Route::post('api-keys', [\App\Http\Controllers\Api\Client\ApiKeyController::class, 'store']);
+            Route::delete('api-keys/{id}', [\App\Http\Controllers\Api\Client\ApiKeyController::class, 'destroy']);
+
+            Route::get('ssh-keys', [\App\Http\Controllers\Api\Client\SSHKeyController::class, 'index']);
+            Route::post('ssh-keys', [\App\Http\Controllers\Api\Client\SSHKeyController::class, 'store']);
+            Route::post('ssh-keys/remove', [\App\Http\Controllers\Api\Client\SSHKeyController::class, 'remove']);
+
+            Route::get('activity', [\App\Http\Controllers\Api\Client\ActivityController::class, 'index']);
+        });
     });
+
 
     // Admin endpoints
     Route::middleware(['admin'])->prefix('admin')->name('api.admin.')->group(function () {

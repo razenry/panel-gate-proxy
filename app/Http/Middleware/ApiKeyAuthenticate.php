@@ -51,11 +51,20 @@ class ApiKeyAuthenticate
             return response()->json(['message' => 'Unauthenticated. Token mismatch.'], 401);
         }
 
+        // Check allowed IPs
+        if ($apiKey->allowed_ips) {
+            $allowedIps = array_map('trim', explode(',', $apiKey->allowed_ips));
+            if (! in_array($request->ip(), $allowedIps) && ! in_array('*', $allowedIps)) {
+                return response()->json(['message' => 'Unauthorized IP address.'], 403);
+            }
+        }
+
         $request->attributes->set('api_key', $apiKey);
 
         if ($apiKey->user_id) {
             Auth::loginUsingId($apiKey->user_id);
         }
+
 
         return $next($request);
     }

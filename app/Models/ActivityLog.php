@@ -2,29 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ApiKey extends Model
+class ActivityLog extends Model
 {
-    use HasUuids;
+    use HasFactory;
 
     protected $fillable = [
-        'token',
         'user_id',
         'description',
-        'expires_at',
-        'allowed_ips',
+        'ip_address',
+        'user_agent',
     ];
-
-
-    protected function casts(): array
-    {
-        return [
-            'expires_at' => 'datetime',
-        ];
-    }
 
     public function user(): BelongsTo
     {
