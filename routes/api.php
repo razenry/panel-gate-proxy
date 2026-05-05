@@ -57,7 +57,9 @@ Route::middleware(['api_key'])->group(function () {
 
     // Admin endpoints
     Route::middleware(['admin'])->prefix('admin')->name('api.admin.')->group(function () {
+        Route::get('users/{user}/sso', [AdminUserController::class, 'sso'])->name('users.sso');
         Route::apiResource('users', AdminUserController::class);
+
         Route::apiResource('nodes', NodeController::class);
 
         // Expose generic tools for Paymenter

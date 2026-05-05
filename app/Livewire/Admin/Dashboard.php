@@ -33,9 +33,9 @@ class Dashboard extends Component
     }
 
     /**
-     * @return array<array<string, mixed>>
+     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getRecentServers(): array
+    public function getRecentServers(): \Illuminate\Database\Eloquent\Collection
     {
         return Server::with(['user', 'node'])
             ->latest()

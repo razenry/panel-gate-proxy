@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Models\User;
+use App\Services\SSOService;
 use App\Traits\ApiResponses;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
@@ -79,5 +80,18 @@ class UserController extends Controller
         $user->delete();
 
         return $this->success(null, 'User deleted successfully.');
+    }
+
+    /**
+     * Generate SSO token for a user.
+     */
+    public function sso(User $user, SSOService $ssoService): JsonResponse
+    {
+        $token = $ssoService->generateToken($user);
+
+        return $this->success([
+            'token' => $token,
+            'url' => config('app.url').'/auth/sso?token='.$token,
+        ]);
     }
 }

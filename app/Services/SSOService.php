@@ -20,7 +20,6 @@ class SSOService
         $this->ttl = (int) Setting::get('sso_ttl', 300);
     }
 
-
     /**
      * Generate an SSO JWT token for a user.
      * Optionally include the admin ID who generated it to allow returning to Admin.
@@ -30,6 +29,8 @@ class SSOService
         $payload = [
             'iss' => config('app.url'),
             'sub' => $user->id,
+            'email' => $user->email,
+            'name' => $user->name,
             'exp' => time() + $this->ttl,
             'iat' => time(),
         ];
@@ -43,8 +44,6 @@ class SSOService
 
     /**
      * Validate an SSO JWT token and return the payload details.
-     * 
-     * @return array|null
      */
     public function validateToken(string $token): ?array
     {
@@ -52,7 +51,7 @@ class SSOService
             $decoded = JWT::decode($token, new Key($this->secretKey, 'HS256'));
 
             $result = [];
-            
+
             if (isset($decoded->sub)) {
                 $result['user_id'] = (int) $decoded->sub;
             }
