@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Models\Node;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class NodeService
 {
@@ -16,12 +18,12 @@ class NodeService
     public function testConnection(Node $node): array
     {
         try {
-            $start    = hrtime(true);
+            $start = hrtime(true);
             $response = Http::timeout(5)->get("{$node->api_url}/api/health");
-            $latency  = (int) round((hrtime(true) - $start) / 1_000_000); // ns → ms
+            $latency = (int) round((hrtime(true) - $start) / 1_000_000); // ns → ms
 
             return [
-                'online'     => $response->successful(),
+                'online' => $response->successful(),
                 'latency_ms' => $response->successful() ? $latency : null,
             ];
         } catch (\Exception $e) {
@@ -42,21 +44,20 @@ class NodeService
      *   ─ port    : NGINX proxy listen port — players connect to this
      * Response: { "data": "kafka_{identifier}.raznar.net" }
      *
-     * @throws \RuntimeException        if the API returns a non-2xx response
-     * @throws \Illuminate\Http\Client\ConnectionException if the connection times out
+     * @throws \RuntimeException if the API returns a non-2xx response
+     * @throws ConnectionException if the connection times out
      */
-    public function createProxy(Node $node, string $identifier, string $backend, int $backendPort, int $proxyPort): string
+    public function createProxy(Node $node, string $identifier, string $srcIp, int $srcPort, int $destPort): string
     {
-        $gateId  = "kafka_{$identifier}";
         $payload = [
-            'id'      => $gateId,
-            'backend' => "{$backend}:{$backendPort}", // FiveM server: ip:port
-            'port'    => $proxyPort,                  // NGINX listens on this port
+            'id' => "kafka_{$identifier}",
+            'backend' => "{$srcIp}:{$srcPort}",
+            'port' => $destPort,
         ];
 
         Log::info('[NodeService] createProxy — sending request', [
-            'node'    => $node->name,
-            'url'     => "{$node->api_url}/api/admin/gate",
+            'node' => $node->name,
+            'url' => "{$node->api_url}/api/admin/gate",
             'payload' => $payload,
         ]);
 
@@ -67,17 +68,17 @@ class NodeService
 
         Log::info('[NodeService] createProxy — response received', [
             'http_status' => $response->status(),
-            'body'        => $response->body(),
+            'body' => $response->body(),
         ]);
 
         if (! $response->successful()) {
             $error = $response->json('error') ?? $response->json('message') ?? $response->body();
 
             Log::error('[NodeService] createProxy — FAILED (non-2xx response)', [
-                'node'        => $node->name,
-                'gate_id'     => $gateId,
+                'node' => $node->name,
+                'gate_id' => $payload['id'],
                 'http_status' => $response->status(),
-                'error'       => $error,
+                'error' => $error,
             ]);
 
             throw new \RuntimeException("Failed to create gate on proxy node {$node->name}: {$error}");
@@ -86,8 +87,8 @@ class NodeService
         $domain = $response->json('data');
 
         Log::info('[NodeService] createProxy — SUCCESS', [
-            'gate_id' => $gateId,
-            'domain'  => $domain,
+            'gate_id' => $payload['id'],
+            'domain' => $domain,
         ]);
 
         return $domain; // e.g. "kafka_myrpserver.raznar.net"
@@ -105,9 +106,9 @@ class NodeService
     public function deleteProxy(Node $node, string $proxyId): void
     {
         Log::info('[NodeService] deleteProxy — sending request', [
-            'node'     => $node->name,
+            'node' => $node->name,
             'proxy_id' => $proxyId,
-            'url'      => "{$node->api_url}/api/admin/gate/{$proxyId}",
+            'url' => "{$node->api_url}/api/admin/gate/{$proxyId}",
         ]);
 
         $response = Http::withToken($node->api_token)
@@ -116,7 +117,7 @@ class NodeService
 
         Log::info('[NodeService] deleteProxy — response received', [
             'http_status' => $response->status(),
-            'body'        => $response->body(),
+            'body' => $response->body(),
         ]);
 
         // 404 = gate already gone (idempotent success — same as reference)
@@ -137,10 +138,10 @@ class NodeService
         $error = $response->json('error') ?? $response->json('message') ?? $response->body();
 
         Log::error('[NodeService] deleteProxy — FAILED', [
-            'node'        => $node->name,
-            'proxy_id'    => $proxyId,
+            'node' => $node->name,
+            'proxy_id' => $proxyId,
             'http_status' => $response->status(),
-            'error'       => $error,
+            'error' => $error,
         ]);
 
         throw new \RuntimeException("Failed to delete gate {$proxyId} on proxy node {$node->name}: {$error}");
@@ -149,13 +150,13 @@ class NodeService
     /**
      * Delete a node from the database.
      * Prevents deletion if servers are still attached.
-     * 
-     * @throws \Illuminate\Validation\ValidationException
+     *
+     * @throws ValidationException
      */
     public function destroyNode(Node $node): void
     {
         if ($node->servers()->exists()) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'node' => 'Cannot delete node while servers are attached.',
             ]);
         }
