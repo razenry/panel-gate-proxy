@@ -20,6 +20,7 @@ Route::get('/user', function (Request $request) {
 
 // External Integration API for Paymenter
 Route::middleware(['external_api'])->prefix('external')->name('external.')->group(function () {
+    Route::get('ping', fn() => response()->json(['message' => 'pong']));
     Route::post('users/sync', [UserController::class, 'sync']);
     Route::post('subscriptions/sync', [SubscriptionController::class, 'sync']);
     Route::post('subscriptions/activate', [SubscriptionController::class, 'activate']);
