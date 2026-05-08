@@ -12,6 +12,9 @@ Route::get('/user', function (Request $request) {
 
 // External Integration API for Paymenter
 Route::middleware(['external_api'])->prefix('external')->name('external.')->group(function () {
+    Route::get('ping', function () {
+        return response()->json(['status' => 'ok', 'timestamp' => now()]);
+    });
     Route::post('users/sync', [\App\Http\Controllers\Api\External\UserController::class, 'sync']);
     Route::post('subscriptions/sync', [\App\Http\Controllers\Api\External\SubscriptionController::class, 'sync']);
     Route::post('subscriptions/activate', [\App\Http\Controllers\Api\External\SubscriptionController::class, 'activate']);
@@ -29,13 +32,14 @@ Route::middleware(['api_key'])->group(function () {
     // Admin endpoints
     Route::middleware(['admin'])->prefix('admin')->name('api.admin.')->group(function () {
         Route::apiResource('nodes', NodeController::class);
-        Route::apiResource('locations', \App\Http\Controllers\Api\Admin\LocationController::class);
+        // Route::apiResource('locations', \App\Http\Controllers\Api\Admin\LocationController::class);
         
         // Expose generic tools for Paymenter
         Route::apiResource('subscriptions', \App\Http\Controllers\Api\Admin\SubscriptionController::class);
         Route::apiResource('servers', \App\Http\Controllers\Api\Admin\ServerController::class)->except(['update']);
         Route::post('servers/{server}/redeploy', [\App\Http\Controllers\Api\Admin\ServerController::class, 'redeploy'])->name('servers.redeploy');
         
+        /*
         // Minecraft Management API
         Route::prefix('minecraft/servers/{server}')->name('minecraft.')->group(function () {
             Route::get('plugins', [\App\Http\Controllers\Api\Minecraft\MinecraftController::class, 'listPlugins']);
@@ -43,5 +47,6 @@ Route::middleware(['api_key'])->group(function () {
             Route::post('config', [\App\Http\Controllers\Api\Minecraft\MinecraftController::class, 'updateConfig']);
             Route::get('connection', [\App\Http\Controllers\Api\Minecraft\MinecraftController::class, 'getConnectionInfo']);
         });
+        */
     });
 });

@@ -13,6 +13,9 @@ services:
       - .env
     networks:
       - laravel-network
+      - raznar-network
+    volumes:
+      - .:/var/www
 
   # Nginx Web Server
   web:
@@ -31,6 +34,9 @@ services:
       - app
     networks:
       - laravel-network
+      - raznar-network
+    volumes:
+      - .:/var/www
 
   # Queue Worker
   worker:
@@ -48,7 +54,13 @@ services:
       - app
     networks:
       - laravel-network
+      - raznar-network
+    volumes:
+      - .:/var/www
 
 networks:
   laravel-network:
+    driver: bridge
+  raznar-network:
+    name: raznar-network
     driver: bridge

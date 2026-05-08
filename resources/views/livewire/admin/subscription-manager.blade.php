@@ -37,7 +37,12 @@
                         </flux:table.cell>
                         <flux:table.cell>
                             <div class="font-medium">{{ $sub->plan_name }}</div>
-                            <div class="text-xs text-zinc-500">Limits: <span class="font-medium">{{ $sub->servers_count }}</span> / {{ $sub->max_server }} servers</div>
+                            @if($sub->plan_id)
+                                <div class="inline-flex mt-1">
+                                    <flux:badge size="xs" color="zinc" class="font-mono">{{ $sub->plan_id }}</flux:badge>
+                                </div>
+                            @endif
+                            <div class="text-xs text-zinc-500 mt-1">Limits: <span class="font-medium">{{ $sub->servers_count }}</span> / {{ $sub->max_server }} servers</div>
                             <div class="text-[10px] font-mono text-zinc-400 mt-1">{{ $sub->external_id }}</div>
                         </flux:table.cell>
                         <flux:table.cell>

@@ -125,6 +125,7 @@ class SubscriptionManager extends Component
         if ($this->editingSubId) {
             Subscription::findOrFail($this->editingSubId)->update([
                 'user_id' => $user->id,
+                'plan_id' => $plan->plan_id ?? null,
                 'plan_name' => $plan->name,
                 'max_server' => $plan->max_server,
                 'status' => $this->status,
@@ -135,6 +136,7 @@ class SubscriptionManager extends Component
             Subscription::create([
                 'user_id' => $user->id,
                 'external_id' => 'manual_' . Str::random(8),
+                'plan_id' => $plan->plan_id ?? null,
                 'plan_name' => $plan->name,
                 'max_server' => $plan->max_server,
                 'status' => $this->status,

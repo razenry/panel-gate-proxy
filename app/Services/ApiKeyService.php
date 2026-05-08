@@ -40,6 +40,7 @@ class ApiKeyService
         $key = new ApiKey;
         $key->id = $id;
         $key->token = hash('sha256', $jwt);
+        $key->raw_token = encrypt($jwt); // Store encrypted for reveal
         $key->user_id = $userId;
         $key->description = $description;
         $key->expires_at = $expiresAt;

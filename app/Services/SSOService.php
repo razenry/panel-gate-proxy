@@ -16,8 +16,8 @@ class SSOService
 
     public function __construct()
     {
-        $this->secretKey = config('external_api.jwt_secret') ?: Setting::get('sso_secret', config('app.key'));
-        $this->ttl = (int) Setting::get('sso_ttl', 300);
+        $this->secretKey = config('external_api.sso_secret') ?: config('app.key');
+        $this->ttl = (int) Setting::get('sso_ttl', 120);
     }
 
 

@@ -53,6 +53,21 @@ class ApiKeyAuthenticate
 
         $request->attributes->set('api_key', $apiKey);
 
+        // Update usage stats
+        $apiKey->update([
+            'last_used_at' => now(),
+            'last_used_ip' => $request->ip(),
+            'request_count' => $apiKey->request_count + 1,
+        ]);
+
+        // Log detailed usage
+        $apiKey->usageLogs()->create([
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'endpoint' => $request->fullUrl(),
+            'method' => $request->method(),
+        ]);
+
         if ($apiKey->user_id) {
             Auth::loginUsingId($apiKey->user_id);
         }

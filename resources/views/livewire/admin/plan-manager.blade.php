@@ -16,6 +16,11 @@
                     <div>
                         <flux:heading size="lg">{{ $plan->name }}</flux:heading>
                         <flux:text variant="subtle" size="sm">Subscription Tier</flux:text>
+                        @if($plan->plan_id)
+                            <div class="mt-1">
+                                <flux:badge size="sm" inset="top bottom" color="zinc" class="font-mono">{{ $plan->plan_id }}</flux:badge>
+                            </div>
+                        @endif
                     </div>
                     <flux:icon icon="credit-card" class="text-zinc-200" />
                 </div>
@@ -44,6 +49,13 @@
                 <flux:label>Plan Name</flux:label>
                 <flux:input wire:model="name" placeholder="Pro, Enterprise, etc." />
                 <flux:error name="name" />
+            </flux:field>
+
+            <flux:field>
+                <flux:label>Plan ID (External Reference)</flux:label>
+                <flux:input wire:model="plan_id" placeholder="e.g. paymenter-prod-1" />
+                <flux:description>Used to map with Paymenter products or external systems.</flux:description>
+                <flux:error name="plan_id" />
             </flux:field>
 
             <flux:field>

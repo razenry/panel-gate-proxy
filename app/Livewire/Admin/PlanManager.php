@@ -13,7 +13,7 @@ class PlanManager extends Component
     public $name;
 
     public $max_server;
-
+    public $plan_id;
     public $editingPlanId;
 
     public $showModal = false;
@@ -40,6 +40,7 @@ class PlanManager extends Component
     public function resetFields()
     {
         $this->name = '';
+        $this->plan_id = '';
         $this->max_server = 1;
         $this->editingPlanId = null;
     }
@@ -51,6 +52,7 @@ class PlanManager extends Component
             $this->editingPlanId = $id;
             $plan = Plan::find($id);
             $this->name = $plan->name;
+            $this->plan_id = $plan->plan_id;
             $this->max_server = $plan->max_server;
         }
         $this->showModal = true;
@@ -60,6 +62,7 @@ class PlanManager extends Component
     {
         $this->validate([
             'name' => 'required|unique:plans,name,'.$this->editingPlanId,
+            'plan_id' => 'nullable|string|max:255',
             'max_server' => 'required|integer|min:1',
         ]);
 
@@ -67,6 +70,7 @@ class PlanManager extends Component
             ['id' => $this->editingPlanId],
             [
                 'name' => $this->name,
+                'plan_id' => $this->plan_id,
                 'max_server' => $this->max_server,
             ]
         );

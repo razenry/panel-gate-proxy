@@ -14,6 +14,7 @@ Route::redirect('/', '/dashboard')->name('home');
 
 // SSO Routes
 Route::get('sso/login', [\App\Http\Controllers\Auth\SSOController::class, 'login'])->name('sso.login');
+Route::post('sso/finalize', [\App\Http\Controllers\Auth\SSOController::class, 'finalize'])->name('sso.finalize');
 
 Route::post('sso/return', [SSOController::class, 'returnToAdmin'])->name('sso.return');
 

@@ -13,6 +13,7 @@ class Plan extends Model
 
     protected $fillable = [
         'name',
+        'plan_id',
         'max_server',
     ];
 }

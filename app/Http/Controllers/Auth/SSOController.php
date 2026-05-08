@@ -30,7 +30,25 @@ class SSOController extends Controller
         $payload = $this->ssoService->validateToken($token);
 
         if (!$payload || empty($payload['email'])) {
-            return redirect()->route('login')->with('error', 'Invalid or expired SSO token.');
+            return view('auth.sso-error', ['message' => 'Invalid or expired SSO token.']);
+        }
+
+        return view('auth.sso-loading', [
+            'token' => $token,
+            'email' => $payload['email']
+        ]);
+    }
+
+    /**
+     * Finalize the SSO login after the loading screen.
+     */
+    public function finalize(Request $request)
+    {
+        $token = $request->input('token');
+        $payload = $this->ssoService->validateToken($token);
+
+        if (!$payload || empty($payload['email'])) {
+            return redirect()->route('login')->with('error', 'Authentication failed.');
         }
 
         try {

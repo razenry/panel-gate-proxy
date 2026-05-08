@@ -21,7 +21,10 @@ class ApiKeyManager extends Component
     public bool $showModal = false;
 
     public bool $showDeleteModal = false;
-
+    public bool $showUsageModal = false;
+    public ?string $selectedKeyId = null;
+    public $usageStats = null;
+    public $recentLogs = [];
     public ?string $deleteTargetId = null;
 
     public string $deleteTargetExpected = '';
@@ -56,6 +59,34 @@ class ApiKeyManager extends Component
     {
         $this->newToken = null;
         $this->showModal = false;
+    }
+
+    public function revealKey(string $id)
+    {
+        $key = ApiKey::findOrFail($id);
+        
+        if ($key->raw_token) {
+            try {
+                $this->newToken = decrypt($key->raw_token);
+                $this->showModal = true;
+            } catch (\Exception $e) {
+                Flux::toast(text: 'Could not decrypt this key. It might be too old.', variant: 'danger');
+            }
+        } else {
+            Flux::toast(text: 'This key was created before the reveal feature was enabled.', variant: 'warning');
+        }
+    }
+
+    public function showUsage(string $id)
+    {
+        $key = ApiKey::with(['usageLogs' => function($q) {
+            $q->latest()->limit(10);
+        }])->findOrFail($id);
+        
+        $this->selectedKeyId = $id;
+        $this->usageStats = $key;
+        $this->recentLogs = $key->usageLogs;
+        $this->showUsageModal = true;
     }
 
     public function confirmDelete(string $id)
