@@ -32,13 +32,25 @@ class ExternalSyncService
     {
         $user = User::where('email', $data['email'])->firstOrFail();
 
+        // Try to resolve internal plan details from plan_id
+        $planName = $data['plan_name'] ?? 'External Plan';
+        $maxServer = $data['max_server'] ?? 1;
+
+        if (!empty($data['plan_id'])) {
+            $plan = \App\Models\Plan::where('plan_id', $data['plan_id'])->first();
+            if ($plan) {
+                $planName = $plan->name;
+                $maxServer = $plan->max_server;
+            }
+        }
+
         return Subscription::updateOrCreate(
             ['external_id' => $data['external_id']],
             [
                 'user_id' => $user->id,
                 'plan_id' => $data['plan_id'] ?? null,
-                'plan_name' => $data['plan_name'] ?? 'External Plan',
-                'max_server' => $data['max_server'] ?? 1,
+                'plan_name' => $planName,
+                'max_server' => $maxServer,
                 'status' => $data['status'] ?? 'active',
                 'expired_at' => $data['expired_at'] ?? null,
             ]
