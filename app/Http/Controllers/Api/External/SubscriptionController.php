@@ -38,7 +38,7 @@ class SubscriptionController extends Controller
                 'data' => $subscription
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to sync subscription: ' . $e->getMessage()], 500);
+            throw new \App\Exceptions\DisplayException('Failed to sync subscription: ' . $e->getMessage());
         }
     }
 

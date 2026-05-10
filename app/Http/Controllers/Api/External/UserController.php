@@ -40,7 +40,7 @@ class UserController extends Controller
                 ]
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to sync user: ' . $e->getMessage()], 500);
+            throw new \App\Exceptions\DisplayException('Failed to sync user: ' . $e->getMessage());
         }
     }
 }
