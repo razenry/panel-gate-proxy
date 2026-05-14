@@ -18,7 +18,17 @@ fi
 # Auto-install composer dependencies if missing
 if [ ! -d "vendor" ] || [ ! -f "vendor/autoload.php" ]; then
     echo "📦 Vendor dependencies missing! Running composer install..."
-    composer install --no-interaction --prefer-dist --optimize-autoloader || echo "⚠️ Composer install failed."
+    
+    COMPOSER_ARGS="--no-interaction --prefer-dist --optimize-autoloader"
+    if [ "$APP_ENV" = "production" ]; then
+        COMPOSER_ARGS="$COMPOSER_ARGS --no-dev"
+    fi
+
+    if ! composer install $COMPOSER_ARGS; then
+        echo "⚠️ Composer install failed. Clearing cache and retrying..."
+        composer clear-cache
+        composer install $COMPOSER_ARGS || echo "❌ Composer install failed again."
+    fi
 fi
 
 # Clear any cached config
