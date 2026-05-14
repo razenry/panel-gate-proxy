@@ -6,6 +6,7 @@ use App\Models\Plan;
 use App\Models\Setting;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Services\CreditService;
 use App\Services\SSOService;
 use App\Services\SubscriptionService;
 use Carbon\CarbonImmutable;
@@ -43,7 +44,7 @@ class UserManager extends Component
     public ?int $manageSubUserId = null;
 
     public $selectedPlanId = '';
-    
+
     public $expiredAt = '';
 
     // Secure Delete State
@@ -56,6 +57,19 @@ class UserManager extends Component
     public string $deleteTargetExpected = '';
 
     public string $deleteVerificationInput = '';
+
+    // Credit Modal State
+    public bool $showCreditModal = false;
+
+    public ?int $creditUserId = null;
+
+    public float $creditAmount = 0;
+
+    public string $creditReason = '';
+
+    public string $creditNotes = '';
+
+    public string $creditCurrency = 'USD';
 
     public function updatingSearch()
     {
@@ -250,6 +264,44 @@ class UserManager extends Component
         }
 
         $this->showDeleteModal = false;
+    }
+
+    public function openCreditModal(int $userId)
+    {
+        $this->resetValidation();
+        $this->creditUserId = $userId;
+        $this->creditAmount = 0;
+        $this->creditReason = '';
+        $this->creditNotes = '';
+        $this->creditCurrency = 'USD';
+        $this->showCreditModal = true;
+    }
+
+    public function addCredit(CreditService $creditService)
+    {
+        $this->validate([
+            'creditAmount' => 'required|numeric|min:0.01',
+            'creditReason' => 'required|string|max:255',
+            'creditCurrency' => 'required|string|size:3',
+        ]);
+
+        $user = User::findOrFail($this->creditUserId);
+
+        try {
+            $creditService->addCredit(
+                $user,
+                $this->creditAmount,
+                $this->creditReason,
+                Auth::id(),
+                $this->creditCurrency,
+                $this->creditNotes ?: null
+            );
+
+            Flux::toast(text: "Successfully added credit to {$user->name}.", variant: 'success');
+            $this->showCreditModal = false;
+        } catch (\Exception $e) {
+            $this->addError('creditAmount', $e->getMessage());
+        }
     }
 
     public function generateSSOLink(int $userId, SSOService $ssoService)

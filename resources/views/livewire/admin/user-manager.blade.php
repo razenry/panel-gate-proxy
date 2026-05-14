@@ -63,6 +63,7 @@
                                     <flux:menu.separator />
                                     <flux:menu.item wire:click="openModal({{ $user->id }})" icon="pencil-square">Edit User</flux:menu.item>
                                     <flux:menu.item wire:click="openSubModal({{ $user->id }})" icon="ticket">Manage Subs</flux:menu.item>
+                                    <flux:menu.item wire:click="openCreditModal({{ $user->id }})" icon="banknotes">Add Credit</flux:menu.item>
                                     <flux:menu.separator />
                                     <flux:menu.item wire:click="confirmDeleteUser({{ $user->id }})" icon="trash" variant="danger">Delete</flux:menu.item>
                                 </flux:menu>
@@ -250,6 +251,47 @@
                     <span x-show="countdown > 0" x-text="'Wait ' + countdown + 's'"></span>
                     <span x-show="countdown === 0">Confirm Delete</span>
                 </flux:button>
+            </div>
+        </form>
+    </flux:modal>
+
+    <!-- Credit Management Modal -->
+    <flux:modal wire:model="showCreditModal" class="md:w-[500px]">
+        <div class="mb-6">
+            <flux:heading size="lg">Add Credit</flux:heading>
+            <flux:subheading>Deposit credits into the user's account ledger.</flux:subheading>
+        </div>
+
+        <form wire:submit="addCredit" class="space-y-4">
+            <div class="flex gap-4">
+                <flux:field class="flex-1">
+                    <flux:label>Amount</flux:label>
+                    <flux:input wire:model="creditAmount" type="number" step="0.01" min="0.01" />
+                    <flux:error name="creditAmount" />
+                </flux:field>
+
+                <flux:field class="w-32">
+                    <flux:label>Currency</flux:label>
+                    <flux:input wire:model="creditCurrency" placeholder="USD" />
+                    <flux:error name="creditCurrency" />
+                </flux:field>
+            </div>
+
+            <flux:field>
+                <flux:label>Reason</flux:label>
+                <flux:input wire:model="creditReason" placeholder="e.g. Promotional Credit, Refund, etc." />
+                <flux:error name="creditReason" />
+            </flux:field>
+
+            <flux:field>
+                <flux:label>Internal Notes (Optional)</flux:label>
+                <flux:textarea wire:model="creditNotes" placeholder="Additional context for admins..." />
+                <flux:error name="creditNotes" />
+            </flux:field>
+
+            <div class="flex justify-end gap-2 pt-4">
+                <flux:button type="button" variant="ghost" wire:click="$set('showCreditModal', false)">Cancel</flux:button>
+                <flux:button type="submit" variant="primary">Add Credit</flux:button>
             </div>
         </form>
     </flux:modal>

@@ -27,6 +27,9 @@
                 <flux:navlist.item icon="ticket" :href="route('my-plan')" :current="request()->routeIs('my-plan')" wire:navigate>
                     {{ __('My Plans') }}
                 </flux:navlist.item>
+                <flux:navlist.item icon="banknotes" :href="route('client.credits')" :current="request()->routeIs('client.credits')" wire:navigate>
+                    {{ __('Credits') }}
+                </flux:navlist.item>
             @endif
 
             @if(auth()->user()?->is_admin)
@@ -48,6 +51,9 @@
                     </flux:navlist.item>
                     <flux:navlist.item icon="key" :href="route('admin.api-keys')" :current="request()->routeIs('admin.api-keys')" wire:navigate>
                         {{ __('API Keys') }}
+                    </flux:navlist.item>
+                    <flux:navlist.item icon="banknotes" :href="route('admin.credits')" :current="request()->routeIs('admin.credits')" wire:navigate>
+                        {{ __('Credit History') }}
                     </flux:navlist.item>
                     <flux:navlist.item icon="cog-8-tooth" :href="route('admin.settings')" :current="request()->routeIs('admin.settings')" wire:navigate>
                         {{ __('Expired Settings') }}

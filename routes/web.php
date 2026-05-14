@@ -1,11 +1,14 @@
 <?php
 
 use App\Http\Controllers\Admin\ImpersonationController;
+use App\Http\Controllers\Client\CreditsController;
 use App\Http\Controllers\SSOController;
 use App\Livewire\Admin\ApiKeyManager;
+use App\Livewire\Admin\CreditHistoryManager;
 use App\Livewire\Admin\Settings;
 use App\Livewire\Admin\SubscriptionManager;
 use App\Livewire\Admin\UserManager;
+use App\Livewire\Client\Credits;
 use App\Livewire\Client\MyPlan;
 use App\Livewire\Client\ServerDetail;
 use Illuminate\Support\Facades\Route;
@@ -13,8 +16,8 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/dashboard')->name('home');
 
 // SSO Routes
-Route::get('sso/login', [\App\Http\Controllers\Auth\SSOController::class, 'login'])->name('sso.login');
-Route::post('sso/finalize', [\App\Http\Controllers\Auth\SSOController::class, 'finalize'])->name('sso.finalize');
+Route::get('sso/login', [App\Http\Controllers\Auth\SSOController::class, 'login'])->name('sso.login');
+Route::post('sso/finalize', [App\Http\Controllers\Auth\SSOController::class, 'finalize'])->name('sso.finalize');
 
 Route::post('sso/return', [SSOController::class, 'returnToAdmin'])->name('sso.return');
 
@@ -23,6 +26,9 @@ Route::middleware(['auth', 'verified', '2fa.enforce'])->group(function () {
 
     // Client Servers
     Route::get('my-plan', MyPlan::class)->name('my-plan');
+    Route::get('credits', Credits::class)->name('client.credits');
+    Route::get('credits/payment/{uuid}', [CreditsController::class, 'simulatePayment'])->name('client.credits.simulate-payment');
+    Route::get('credits/callback/{uuid}', [CreditsController::class, 'callback'])->name('client.credits.callback');
     Route::view('servers', 'pages.servers.index')->name('servers.index');
     Route::get('servers/{id}', ServerDetail::class)->name('servers.show');
 
@@ -35,6 +41,7 @@ Route::middleware(['auth', 'verified', '2fa.enforce'])->group(function () {
         Route::get('users', UserManager::class)->name('users');
         Route::get('subscriptions', SubscriptionManager::class)->name('subscriptions');
         Route::get('api-keys', ApiKeyManager::class)->name('api-keys');
+        Route::get('credits', CreditHistoryManager::class)->name('credits');
         Route::get('settings', Settings::class)->name('settings');
 
         // Impersonation

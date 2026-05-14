@@ -13,7 +13,7 @@
                 </flux:button>
             </div>
 
-            <div class="mt-8 grid grid-cols-3 gap-6">
+            <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div>
                     <div class="text-4xl font-bold">{{ $totalActive }}</div>
                     <div class="text-blue-200 text-xs mt-1 uppercase tracking-wider">Active Servers</div>
@@ -25,6 +25,10 @@
                 <div>
                     <div class="text-4xl font-bold">{{ $nodes }}</div>
                     <div class="text-blue-200 text-xs mt-1 uppercase tracking-wider">Online Nodes</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold">${{ number_format($user->balance, 2) }}</div>
+                    <div class="text-blue-200 text-xs mt-1 uppercase tracking-wider">Credits</div>
                 </div>
             </div>
         </div>
