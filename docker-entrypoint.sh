@@ -27,7 +27,7 @@ if [ ! -d "vendor" ] || [ ! -f "vendor/autoload.php" ]; then
     if ! composer install $COMPOSER_ARGS; then
         echo "⚠️ Composer install failed. Clearing cache and retrying..."
         composer clear-cache
-        composer install $COMPOSER_ARGS || echo "❌ Composer install failed again."
+        composer install $COMPOSER_ARGS || { echo "❌ Composer install failed again. Exiting."; exit 1; }
     fi
 fi
 
